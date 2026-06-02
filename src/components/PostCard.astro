@@ -1,0 +1,11 @@
+---
+const { post } = Astro.props;
+const dateStr = post.data.date.toLocaleDateString('en-GB', {
+  year: 'numeric', month: 'short', day: 'numeric',
+});
+---
+<article class="post-card">
+  <time datetime={post.data.date.toISOString()}>{dateStr}</time>
+  <h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3>
+  <p>{post.data.description}</p>
+</article>
