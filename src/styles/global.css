@@ -46,7 +46,7 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hover); text-decoration: underline; }
 
-h1, h2, h3 { line-height: 1.25; font-weight: 650; }
+h1, h2, h3 { line-height: 1.25; font-weight: 600; }
 h1 { font-size: 1.9rem; }
 h2 { font-size: 1.4rem; margin-top: 2rem; }
 
@@ -81,7 +81,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 .site-header nav { display: flex; align-items: center; gap: 1.1rem; }
 .site-header nav a { color: var(--text); font-size: 0.97rem; }
 .site-header nav a:hover { color: var(--accent); text-decoration: none; }
-.brand { font-weight: 700; font-size: 1.1rem; color: var(--text) !important; }
+.site-header .brand { font-weight: 700; font-size: 1.1rem; color: var(--text); }
 
 .site-footer {
   border-top: 1px solid var(--border);

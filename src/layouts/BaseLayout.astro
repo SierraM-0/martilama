@@ -3,6 +3,11 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 
+interface Props {
+  title?: string;
+  description?: string;
+}
+
 const { title, description } = Astro.props;
 const siteTitle = "marti";
 const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} — personal site`;
@@ -19,6 +24,7 @@ const desc = description ?? "Writing about life and my small opinions.";
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={desc} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
     <link rel="alternate" type="application/rss+xml" title={siteTitle} href="/rss.xml" />
     <script is:inline>
       const stored = localStorage.getItem('theme');
