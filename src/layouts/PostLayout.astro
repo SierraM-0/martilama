@@ -1,14 +1,19 @@
 ---
+import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
+import { formatDate } from '../utils/formatDate';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
 const { post } = Astro.props;
-const dateStr = post.data.date.toLocaleDateString('en-GB', {
-  year: 'numeric', month: 'short', day: 'numeric',
-});
+const dateStr = formatDate(post.data.date);
 ---
 <BaseLayout title={post.data.title} description={post.data.description}>
   <article>
     <h1>{post.data.title}</h1>
-    <p><time datetime={post.data.date.toISOString()} style="color:var(--muted);font-family:var(--font-mono);font-size:0.85rem;">{dateStr}</time></p>
+    <p><time class="post-date" datetime={post.data.date.toISOString()}>{dateStr}</time></p>
     <slot />
   </article>
   <p style="margin-top:2.5rem;"><a href="/blog">← all posts</a></p>

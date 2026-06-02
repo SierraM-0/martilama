@@ -1,8 +1,13 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../utils/formatDate';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
 const { post } = Astro.props;
-const dateStr = post.data.date.toLocaleDateString('en-GB', {
-  year: 'numeric', month: 'short', day: 'numeric',
-});
+const dateStr = formatDate(post.data.date);
 ---
 <article class="post-card">
   <time datetime={post.data.date.toISOString()}>{dateStr}</time>

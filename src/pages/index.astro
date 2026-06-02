@@ -11,7 +11,7 @@ const posts = (await getCollection('blog'))
 ---
 <BaseLayout>
   <section class="intro">
-    <Image src={portrait} alt="A photo of marti" width={120} height={120} class="portrait" />
+    <Image src={portrait} alt="A photo of marti" width={120} height={120} class="portrait" loading="eager" fetchpriority="high" />
     <div>
       <h1>Hello 👋🏻</h1>
       <p>
