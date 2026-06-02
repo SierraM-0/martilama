@@ -1,10 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import { getSortedPosts } from '../../utils/posts';
 
-const posts = (await getCollection('blog'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const posts = await getSortedPosts();
 ---
 <BaseLayout title="Blog" description="Posts about life and my small opinions.">
   <h1>Blog</h1>
