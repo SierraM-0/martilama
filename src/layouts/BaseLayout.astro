@@ -6,9 +6,10 @@ import Footer from '../components/Footer.astro';
 interface Props {
   title?: string;
   description?: string;
+  ogType?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogType = "website" } = Astro.props;
 const siteTitle = "marti";
 const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} — personal site`;
 const desc = description ?? "Writing about life and my small opinions.";
@@ -23,7 +24,7 @@ const desc = description ?? "Writing about life and my small opinions.";
     <meta name="description" content={desc} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={desc} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={Astro.url} />
     <link rel="alternate" type="application/rss+xml" title={siteTitle} href="/rss.xml" />
     <script is:inline>
