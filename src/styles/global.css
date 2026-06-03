@@ -274,6 +274,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 
 /* Post list */
 .post-card { padding: 1.4rem 0; border-bottom: 1px solid var(--border); }
+.post-card:last-of-type { border-bottom: none; }
 .post-card time, .post-date {
   color: var(--muted);
   font-size: 0.8rem;
@@ -304,6 +305,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 /* Contents-page blog index */
 .contents { list-style: none; padding: 0; margin: 2rem 0 0; }
 .contents-row { padding: 1.05rem 0; border-bottom: 1px solid var(--border); }
+.contents-row:last-child { border-bottom: none; }
 .contents-line { display: flex; align-items: baseline; gap: 0.7rem; }
 .contents-num {
   font-family: var(--font-mono);
