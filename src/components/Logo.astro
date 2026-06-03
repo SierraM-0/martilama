@@ -1,0 +1,24 @@
+---
+interface Props {
+  size?: number;
+}
+const { size = 30 } = Astro.props;
+---
+<!-- Mannaz (ᛗ) — the Elder Futhark rune for M. Badge fills with the accent;
+     the rune knocks out to the page background, so it adapts to light/dark. -->
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  class="logo-mark"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect x="3" y="3" width="58" height="58" rx="18" fill="var(--accent)" />
+  <g fill="none" stroke="var(--bg)" stroke-width="5" stroke-linecap="round">
+    <path d="M21 19 V45" />
+    <path d="M43 19 V45" />
+    <path d="M21 22 L43 34" />
+    <path d="M43 22 L21 34" />
+  </g>
+</svg>

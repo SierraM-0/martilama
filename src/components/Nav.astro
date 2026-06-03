@@ -1,8 +1,12 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
+import Logo from './Logo.astro';
 ---
 <header class="site-header">
-  <a class="brand" href="/">marti</a>
+  <a class="brand" href="/">
+    <Logo size={30} />
+    <span>marti</span>
+  </a>
   <nav>
     <a href="/blog">blog</a>
     <a href="/work">work</a>

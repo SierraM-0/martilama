@@ -8,7 +8,7 @@ import portrait from '../assets/portrait.png';
 const posts = (await getSortedPosts()).slice(0, 5);
 ---
 <BaseLayout>
-  <section class="intro">
+  <section class="intro reveal">
     <Image src={portrait} alt="A photo of marti" width={120} height={120} class="portrait" loading="eager" fetchpriority="high" />
     <div>
       <h1>Hello 👋🏻</h1>
@@ -18,7 +18,21 @@ const posts = (await getSortedPosts()).slice(0, 5);
       </p>
     </div>
   </section>
+  <p class="hero-meta reveal reveal-2">Tallinn, Estonia · <time id="localtime">—</time> local</p>
 
-  <h2>Recent posts</h2>
+  <h2 class="reveal reveal-3">Recent posts</h2>
   {posts.map((post) => <PostCard post={post} />)}
 </BaseLayout>
+
+<script is:inline>
+  (function () {
+    const el = document.getElementById('localtime');
+    if (!el) return;
+    const fmt = new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Tallinn',
+    });
+    const tick = () => { el.textContent = fmt.format(new Date()); };
+    tick();
+    setInterval(tick, 30000);
+  })();
+</script>

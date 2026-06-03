@@ -1,7 +1,8 @@
 :root {
-  --maxw: 720px;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
-  --font-mono: ui-monospace, "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
+  --maxw: 700px;
+  --font-body: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, "JetBrains Mono", monospace;
 
   /* Light theme (warm) */
   --bg: #faf8f5;
@@ -11,6 +12,7 @@
   --border: #e7e0d6;
   --accent: #b85c38;       /* warm terracotta */
   --accent-hover: #9c4a2b;
+  --grain: 0.035;
 }
 
 :root[data-theme="dark"] {
@@ -21,20 +23,44 @@
   --border: #2a241e;
   --accent: #e0915f;
   --accent-hover: #eba874;
+  --grain: 0.05;
 }
 
 * { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  font-optical-sizing: auto;
+}
 
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 1.05rem;
-  line-height: 1.65;
+  font-family: var(--font-body);
+  font-size: 1.18rem;
+  line-height: 1.72;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Warm radial glow layered over the base colour */
+  background-color: var(--bg);
+  background-image: radial-gradient(120% 65% at 50% -15%,
+    color-mix(in oklab, var(--accent) 13%, transparent), transparent 55%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Fine film grain, behind content */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
 }
 
 .container {
@@ -43,16 +69,29 @@ body {
   padding: 0 1.25rem;
 }
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { color: var(--accent-hover); text-decoration: underline; }
+a { color: var(--accent); text-decoration: none; transition: color 0.25s ease; }
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
 
-h1, h2, h3 { line-height: 1.25; font-weight: 600; }
-h1 { font-size: 1.9rem; }
-h2 { font-size: 1.4rem; margin-top: 2rem; }
+::selection { background: color-mix(in oklab, var(--accent) 26%, transparent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 560;
+  line-height: 1.15;
+  letter-spacing: -0.012em;
+}
+h1 { font-size: 2.2rem; }
+h2 { font-size: 1.5rem; margin-top: 2.2rem; }
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  font-size: 0.86em;
   background: var(--surface);
   padding: 0.15em 0.35em;
   border-radius: 4px;
@@ -77,22 +116,37 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   padding: 1.5rem 0;
   border-bottom: 1px solid var(--border);
   margin-bottom: 2.5rem;
+  transition: border-color 0.5s ease;
 }
 .site-header nav { display: flex; align-items: center; gap: 1.1rem; }
-.site-header nav a { color: var(--text); font-size: 0.97rem; }
+.site-header nav a { color: var(--text); font-size: 0.98rem; }
 .site-header nav a:hover { color: var(--accent); text-decoration: none; }
-.site-header .brand { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+.site-header .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.site-header .brand:hover { color: var(--accent); text-decoration: none; }
+.logo-mark { display: block; flex-shrink: 0; transition: transform 0.25s ease; }
+.site-header .brand:hover .logo-mark { transform: rotate(-6deg); }
 
 .site-footer {
   border-top: 1px solid var(--border);
   margin-top: 4rem;
   padding: 2rem 0;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+  transition: border-color 0.5s ease;
 }
 .site-footer a { color: var(--muted); }
 
@@ -105,35 +159,98 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   cursor: pointer;
   font-size: 0.95rem;
   line-height: 1;
+  transition: border-color 0.25s ease, transform 0.25s ease;
 }
-.theme-toggle:hover { border-color: var(--accent); }
+.theme-toggle:hover { border-color: var(--accent); transform: rotate(-18deg); }
 
 /* Home */
-.intro { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 2.5rem; }
-.portrait { width: 120px; height: 120px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
+.intro { display: flex; gap: 1.6rem; align-items: center; margin-bottom: 1rem; }
+.portrait { width: 116px; height: 116px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
+.hero-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin: 0 0 2.6rem;
+}
 
 /* Post list */
-.post-card { padding: 1.1rem 0; border-bottom: 1px solid var(--border); }
-.post-card time, .post-date { color: var(--muted); font-size: 0.85rem; font-family: var(--font-mono); }
-.post-card h3 { margin: 0.2rem 0 0.3rem; font-size: 1.25rem; }
+.post-card { padding: 1.15rem 0; border-bottom: 1px solid var(--border); }
+.post-card time, .post-date {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum";
+  letter-spacing: 0.02em;
+}
+.post-card h3 { margin: 0.25rem 0 0.3rem; font-size: 1.35rem; }
+.post-card h3 a { color: var(--text); }
+.post-card h3 a:hover { color: var(--accent); }
 .post-card p { margin: 0; color: var(--muted); }
 
 /* Post body typography */
-.post p { margin: 0 0 1.2rem; }
-.post ul, .post ol { margin: 0 0 1.2rem; padding-left: 1.4rem; }
+.post h1 { margin-bottom: 0.3rem; }
+.post p { margin: 0 0 1.25rem; }
+.post a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
+}
+.post ul, .post ol { margin: 0 0 1.25rem; padding-left: 1.4rem; }
 .post li { margin: 0.3rem 0; }
 .post blockquote {
-  margin: 1.2rem 0;
-  padding: 0.2rem 0 0.2rem 1rem;
+  margin: 1.4rem 0;
+  padding: 0.3rem 0 0.3rem 1.1rem;
   border-left: 3px solid var(--accent);
   color: var(--muted);
+  font-style: italic;
+  transition: border-color 0.5s ease;
+}
+.post-end {
+  margin: 2.6rem 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.5em;
+  opacity: 0.7;
 }
 
 /* Photos */
 .photo { margin: 1.5rem 0; }
 .photo img { border-radius: 10px; }
-.photo figcaption { color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }
+.photo figcaption {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-family: var(--font-mono);
+  margin-top: 0.5rem;
+}
 
 @media (max-width: 480px) {
   .intro { flex-direction: column; text-align: center; }
+  h1 { font-size: 1.95rem; }
+}
+
+/* Motion — one orchestrated page-load reveal, opt-out respected */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: reveal 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+  .reveal-2 { animation-delay: 0.08s; }
+  .reveal-3 { animation-delay: 0.16s; }
+  .reveal-4 { animation-delay: 0.24s; }
+
+  .post-card { opacity: 0; animation: reveal 0.6s ease forwards; }
+  .post-card:nth-child(1) { animation-delay: 0.20s; }
+  .post-card:nth-child(2) { animation-delay: 0.28s; }
+  .post-card:nth-child(3) { animation-delay: 0.36s; }
+  .post-card:nth-child(4) { animation-delay: 0.44s; }
+  .post-card:nth-child(5) { animation-delay: 0.52s; }
+  .post-card:nth-child(n + 6) { animation-delay: 0.58s; }
+}
+
+@keyframes reveal {
+  to { opacity: 1; transform: none; }
 }
