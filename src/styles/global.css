@@ -213,7 +213,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 }
 
 /* Home */
-.intro { display: flex; gap: 1.6rem; align-items: center; margin-bottom: 0.1rem; }
+.intro { display: flex; gap: 1.6rem; align-items: center; margin-bottom: 0.6rem; }
 .intro p { margin-bottom: 0; }
 .portrait { width: 116px; height: 116px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
 .hero-meta {
