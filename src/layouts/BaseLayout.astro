@@ -34,9 +34,20 @@ const desc = description ?? "Writing about life and my small opinions.";
     <link rel="alternate" type="application/rss+xml" title={siteTitle} href="/rss.xml" />
     <ClientRouter />
     <script is:inline>
-      const stored = localStorage.getItem('theme');
-      const theme = stored ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.dataset.theme = theme;
+      (function () {
+        const apply = () => {
+          const theme = localStorage.getItem('theme')
+            ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.dataset.theme = theme;
+        };
+        apply();
+        // View Transitions swap <html> attributes on navigation, dropping
+        // data-theme — re-apply it before the new page paints. Bind once.
+        if (!window.__themeBound) {
+          window.__themeBound = true;
+          document.addEventListener('astro:after-swap', apply);
+        }
+      })();
     </script>
   </head>
   <body>

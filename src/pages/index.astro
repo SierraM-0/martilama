@@ -24,15 +24,24 @@ const posts = (await getSortedPosts()).slice(0, 5);
   {posts.map((post) => <PostCard post={post} />)}
 </BaseLayout>
 
-<script is:inline>
-  (function () {
-    const el = document.getElementById('localtime');
-    if (!el) return;
-    const fmt = new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Tallinn',
-    });
-    const tick = () => { el.textContent = fmt.format(new Date()); };
+<script>
+  const fmt = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Tallinn',
+  });
+  let timer: ReturnType<typeof setInterval> | undefined;
+
+  function initClock() {
+    const tick = () => {
+      const el = document.getElementById('localtime');
+      if (el) el.textContent = fmt.format(new Date());
+    };
+    if (!document.getElementById('localtime')) return;
     tick();
-    setInterval(tick, 30000);
-  })();
+    clearInterval(timer);
+    timer = setInterval(tick, 30000);
+  }
+
+  // Runs on first load and after every View Transitions navigation.
+  initClock();
+  document.addEventListener('astro:page-load', initClock);
 </script>
