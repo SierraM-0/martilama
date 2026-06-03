@@ -28,17 +28,23 @@ const posts = (await getSortedPosts()).slice(0, 5);
   const fmt = new Intl.DateTimeFormat('en-GB', {
     hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Tallinn',
   });
-  let timer: ReturnType<typeof setInterval> | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  // Update exactly on each minute boundary so the shown time never lags the
+  // real clock, instead of polling on a fixed interval.
+  function tick() {
+    const el = document.getElementById('localtime');
+    if (!el) return; // navigated away from home — stop the chain
+    el.textContent = fmt.format(new Date());
+    const now = new Date();
+    const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    clearTimeout(timer);
+    timer = setTimeout(tick, msToNextMinute + 50);
+  }
 
   function initClock() {
-    const tick = () => {
-      const el = document.getElementById('localtime');
-      if (el) el.textContent = fmt.format(new Date());
-    };
-    if (!document.getElementById('localtime')) return;
+    clearTimeout(timer);
     tick();
-    clearInterval(timer);
-    timer = setInterval(tick, 30000);
   }
 
   // Runs on first load and after every View Transitions navigation.
