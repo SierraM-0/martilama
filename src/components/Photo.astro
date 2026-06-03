@@ -8,11 +8,12 @@ interface Props {
   caption?: string;
   width?: number;
   wide?: boolean;
+  eager?: boolean;
 }
 
-const { src, alt, caption, wide = false, width = wide ? 1040 : 720 } = Astro.props;
+const { src, alt, caption, wide = false, eager = false, width = wide ? 1040 : 720 } = Astro.props;
 ---
 <figure class:list={['photo', { 'photo--wide': wide }]}>
-  <Image src={src} alt={alt} width={width} />
+  <Image src={src} alt={alt} width={width} loading={eager ? 'eager' : 'lazy'} />
   {caption && <figcaption>{caption}</figcaption>}
 </figure>

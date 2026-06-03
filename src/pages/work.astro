@@ -2,25 +2,30 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Work" description="What I do as a product specialist.">
-  <h1>Work</h1>
-
-  <p>
-    I work as a product specialist: I care about the gap between what a product
-    is supposed to do and what it actually does for the person in front of it.
-    My background mixes engineering and academic work, and I bring that
-    systems-minded, slightly stubborn attention to detail to product problems.
+  <h1 class="reveal">Work</h1>
+  <p class="standfirst reveal reveal-2">
+    What I do as a product specialist — the short, honest version.
   </p>
 
-  <h2>What I focus on</h2>
-  <ul>
-    <li>Understanding real user needs over assumed ones.</li>
-    <li>Turning messy problems into clear, decidable trade-offs.</li>
-    <li>Keeping the people using a product at the centre of the work.</li>
-  </ul>
+  <div class="prose reveal reveal-3">
+    <p>
+      I work as a product specialist: I care about the gap between what a product
+      is supposed to do and what it actually does for the person in front of it.
+      My background mixes engineering and academic work, and I bring that
+      systems-minded, slightly stubborn attention to detail to product problems.
+    </p>
 
-  <h2>Elsewhere</h2>
-  <p>
-    For roles, dates, and the formal version, see my
-    <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
-  </p>
+    <div class="section-head"><h2 class="section-kicker">What I focus on</h2></div>
+    <ul>
+      <li>Understanding real user needs over assumed ones.</li>
+      <li>Turning messy problems into clear, decidable trade-offs.</li>
+      <li>Keeping the people using a product at the centre of the work.</li>
+    </ul>
+
+    <div class="section-head"><h2 class="section-kicker">Elsewhere</h2></div>
+    <p>
+      For roles, dates, and the formal version, see my
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
+    </p>
+  </div>
 </BaseLayout>
