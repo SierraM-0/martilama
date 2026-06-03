@@ -263,6 +263,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   background: var(--accent);
   flex-shrink: 0;
 }
+.section-kicker.no-tick::before { display: none; }
 .section-more {
   font-family: var(--font-mono);
   font-size: 0.76rem;
