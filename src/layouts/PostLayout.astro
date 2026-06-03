@@ -9,13 +9,22 @@ interface Props {
 
 const { post } = Astro.props;
 const dateStr = formatDate(post.data.date);
+
+const words = (post.body ?? '').trim().split(/\s+/).filter(Boolean).length;
+const minutes = Math.max(1, Math.round(words / 200));
 ---
 <BaseLayout title={post.data.title} description={post.data.description} ogType="article">
   <article class="post reveal">
     <h1>{post.data.title}</h1>
-    <p><time class="post-date" datetime={post.data.date.toISOString()}>{dateStr}</time></p>
-    <slot />
+    <p class="standfirst">{post.data.description}</p>
+    <p class="post-meta">
+      <time class="post-date" datetime={post.data.date.toISOString()}>{dateStr}</time>
+      <span aria-hidden="true">·</span> {minutes} min read
+    </p>
+    <div class="post-body">
+      <slot />
+    </div>
     <p class="post-end" aria-hidden="true">· · ·</p>
   </article>
-  <p style="margin-top:2.5rem;"><a href="/blog">← all posts</a></p>
+  <p class="post-back"><a href="/blog">← all posts</a></p>
 </BaseLayout>

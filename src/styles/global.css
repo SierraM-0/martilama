@@ -189,7 +189,33 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 .post-card p { margin: 0; color: var(--muted); }
 
 /* Post body typography */
-.post h1 { margin-bottom: 0.3rem; }
+.post h1 { margin-bottom: 0.5rem; }
+.standfirst {
+  font-style: italic;
+  font-size: 1.32rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0 0 0.9rem;
+  font-variation-settings: 'opsz' 40, 'SOFT' 50;
+}
+.post-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin: 0 0 2.2rem;
+}
+.post-body > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 3.5em;
+  line-height: 0.74;
+  padding: 0.04em 0.09em 0 0;
+  color: var(--accent);
+  font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+}
+.post-back { margin-top: 2.6rem; }
 .post p { margin: 0 0 1.25rem; }
 .post a {
   text-decoration: underline;
