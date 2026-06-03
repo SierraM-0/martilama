@@ -119,8 +119,16 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   transition: border-color 0.5s ease;
 }
 .site-header nav { display: flex; align-items: center; gap: 1.1rem; }
-.site-header nav a { color: var(--text); font-size: 0.98rem; }
-.site-header nav a:hover { color: var(--accent); text-decoration: none; }
+.site-header nav a {
+  color: var(--text);
+  font-size: 0.98rem;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease, color 0.25s ease;
+}
+.site-header nav a:hover { color: var(--accent); background-size: 100% 1.5px; text-decoration: none; }
 .site-header .brand {
   display: inline-flex;
   align-items: center;
@@ -151,17 +159,43 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 .site-footer a { color: var(--muted); }
 
 .theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: 1px solid var(--border);
   color: var(--text);
-  border-radius: 6px;
-  padding: 0.3rem 0.5rem;
+  border-radius: 7px;
+  padding: 0.32rem;
   cursor: pointer;
-  font-size: 0.95rem;
-  line-height: 1;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  line-height: 0;
+  transition: border-color 0.25s ease, color 0.25s ease;
 }
-.theme-toggle:hover { border-color: var(--accent); transform: rotate(-18deg); }
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.toggle-icon { display: block; }
+.toggle-icon .sun,
+.toggle-icon .rays,
+.toggle-icon .moon-dot {
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease;
+}
+.toggle-icon .rays { transform-origin: 12px 12px; }
+.toggle-icon .sun { transform-origin: 12px 12px; }
+:root[data-theme="dark"] .toggle-icon .moon-dot { transform: translateX(-9px); }
+:root[data-theme="dark"] .toggle-icon .rays { opacity: 0; transform: scale(0.4) rotate(45deg); }
+:root[data-theme="dark"] .toggle-icon .sun { transform: scale(1.06); }
+
+/* Reading-progress bar (fills only on post pages) */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--accent);
+  z-index: 50;
+  pointer-events: none;
+  transition: width 0.1s linear;
+}
 
 /* Home */
 .intro { display: flex; gap: 1.6rem; align-items: center; margin-bottom: 1rem; }
