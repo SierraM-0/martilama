@@ -219,18 +219,19 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 .hero-meta {
   font-family: var(--font-body);
   font-style: italic;
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: var(--muted);
+  opacity: 0.9;
   margin: 0 0 2.6rem;
-  font-variation-settings: 'opsz' 30, 'SOFT' 50;
+  font-variation-settings: 'opsz' 24, 'SOFT' 50;
 }
 .hero-meta time {
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: 0.82em;
+  font-size: 0.85em;
   font-feature-settings: "tnum";
   letter-spacing: 0.02em;
-  color: var(--text);
+  color: var(--muted);
 }
 
 /* Section heading — quiet kicker bar so post titles stay the focus */
