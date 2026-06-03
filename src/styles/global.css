@@ -263,16 +263,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   background: var(--accent);
   flex-shrink: 0;
 }
-/* Code-comment section label (Work) — a quiet nod to the terminal */
-.code-label {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 0.92rem;
-  text-transform: lowercase;
-  color: var(--muted);
-  margin: 1.9rem 0 0.6rem;
-}
-.code-label::before { content: "// "; color: var(--accent); }
+.section-kicker.no-tick::before { display: none; }
 .section-more {
   font-family: var(--font-mono);
   font-size: 0.76rem;
