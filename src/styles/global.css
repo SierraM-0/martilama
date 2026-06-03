@@ -217,11 +217,20 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 .intro p { margin-bottom: 0; }
 .portrait { width: 116px; height: 116px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
 .hero-meta {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
   color: var(--muted);
-  letter-spacing: 0.02em;
   margin: 0 0 2.6rem;
+  font-variation-settings: 'opsz' 30, 'SOFT' 50;
+}
+.hero-meta time {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  font-feature-settings: "tnum";
+  letter-spacing: 0.02em;
+  color: var(--text);
 }
 
 /* Section heading — quiet kicker bar so post titles stay the focus */
