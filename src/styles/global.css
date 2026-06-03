@@ -218,7 +218,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 .portrait { width: 116px; height: 116px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
 .hero-meta {
   font-family: var(--font-body);
-  font-style: normal;
+  font-style: italic;
   font-size: 1rem;
   color: var(--muted);
   margin: 0 0 2.6rem;
