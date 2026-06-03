@@ -7,11 +7,12 @@ interface Props {
   alt: string;
   caption?: string;
   width?: number;
+  wide?: boolean;
 }
 
-const { src, alt, caption, width = 720 } = Astro.props;
+const { src, alt, caption, wide = false, width = wide ? 1040 : 720 } = Astro.props;
 ---
-<figure class="photo">
+<figure class:list={['photo', { 'photo--wide': wide }]}>
   <Image src={src} alt={alt} width={width} />
   {caption && <figcaption>{caption}</figcaption>}
 </figure>

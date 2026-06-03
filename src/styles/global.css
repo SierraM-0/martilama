@@ -150,13 +150,12 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   color: var(--muted);
   font-size: 0.88rem;
   font-family: var(--font-mono);
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
   transition: border-color 0.5s ease;
 }
 .site-footer a { color: var(--muted); }
+.footer-currently { margin: 0 0 1rem; line-height: 1.6; }
+.footer-currently em { font-style: italic; font-family: var(--font-body); color: var(--text); }
+.footer-meta { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 
 .theme-toggle {
   display: inline-flex;
@@ -324,6 +323,19 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 /* Photos */
 .photo { margin: 1.5rem 0; }
 .photo img { border-radius: 10px; }
+.photo--wide {
+  width: min(94vw, 1040px);
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+.photo--wide img { width: 100%; border-radius: 12px; }
+
+/* Code blocks — warm Shiki dual theme switched by data-theme */
+.astro-code { background-color: var(--shiki-light-bg); color: var(--shiki-light); }
+.astro-code span { color: var(--shiki-light); }
+:root[data-theme="dark"] .astro-code { background-color: var(--shiki-dark-bg); color: var(--shiki-dark); }
+:root[data-theme="dark"] .astro-code span { color: var(--shiki-dark); }
 .photo figcaption {
   color: var(--muted);
   font-size: 0.84rem;
