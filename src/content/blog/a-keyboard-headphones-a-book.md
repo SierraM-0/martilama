@@ -18,7 +18,7 @@ computer the keyboard is connected to. But once you separate "objects I use" fro
 ## The honest part
 
 I think the honest part is that I expected the list to be longer. I have a
-3D printer that hasn't run in more than eight months, a small shelf of board
+3D printer that hasn't run in more than eight months,[^printer] a small shelf of board
 games, a drawer of cables I keep meaning to sort. None of that made the list.
 Wanting to use a thing isn't the same as reaching for it.
 
@@ -26,8 +26,7 @@ The keyboard I reach for because the day is mostly typing. The headphones I
 reach for because the day is mostly typing *and* I'd like to choose what's in
 the room with me while I do it. The book is the one that surprised me a little —
 it's there because at some point in the evening I want the screen to stop being
-the answer. It's a Kindle, technically, loaded from a Calibre library I drift
-through most evenings to pick what's next. I count it as a book because that's
+the answer.[^kindle] I count it as a book because that's
 what the hands and the eyes are doing.
 
 I don't think a short list is a problem. I think it's just what an honest day
@@ -38,3 +37,7 @@ actually do the work of a day are worth knowing by name.
 
 Mine, this week, are a keyboard, headphones, and whatever book is currently
 half-finished on the bedside table.
+
+[^kindle]: It's a Kindle, technically, loaded from a Calibre library I drift through most evenings to pick what's next.
+
+[^printer]: Wanting to use a thing isn't the same as reaching for it — the printer is pure intention.
