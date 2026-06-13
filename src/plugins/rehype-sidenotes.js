@@ -33,7 +33,10 @@ export default function rehypeSidenotes() {
 
     if (defs.size === 0) return;
 
-    // Pass 2: replace each inline reference with the triplet.
+    // Pass 2: replace each inline reference with the triplet. GFM allows a
+    // footnote label to be referenced more than once; track emissions per
+    // label so reused references get unique ids (sn-a, sn-a-2, sn-a-3, ...).
+    const counts = new Map();
     visit(tree, 'element', (node, index, parent) => {
       if (node.tagName !== 'sup') return;
       const a = node.children.find(
@@ -48,7 +51,9 @@ export default function rehypeSidenotes() {
       const content = defs.get(id);
       if (!content) return;
       const label = id.startsWith(FN_PREFIX) ? id.slice(FN_PREFIX.length) : id;
-      const sid = `sn-${label}`;
+      const n = (counts.get(label) || 0) + 1;
+      counts.set(label, n);
+      const sid = n === 1 ? `sn-${label}` : `sn-${label}-${n}`;
       const triplet = [
         el('input', { type: 'checkbox', id: sid, className: ['margin-toggle'] }),
         el('label', {
@@ -56,7 +61,7 @@ export default function rehypeSidenotes() {
           className: ['margin-toggle', 'sidenote-number'],
           'aria-label': 'Toggle sidenote',
         }),
-        el('span', { className: ['sidenote'] }, content),
+        el('span', { className: ['sidenote'] }, cloneNodes(content)),
       ];
       parent.children.splice(index, 1, ...triplet);
       return [SKIP, index + triplet.length];
@@ -66,6 +71,12 @@ export default function rehypeSidenotes() {
 
 function el(tagName, properties, children = []) {
   return { type: 'element', tagName, properties, children };
+}
+
+// Deep-clone hast nodes so a reused definition's content isn't shared across
+// multiple positions in the tree.
+function cloneNodes(nodes) {
+  return nodes.map((node) => structuredClone(node));
 }
 
 function findElement(root, pred) {
@@ -81,17 +92,24 @@ function findElement(root, pred) {
 
 // Pull inline content out of a footnote <li>, unwrapping its <p> and dropping
 // the back-reference anchor. Leading/trailing whitespace-only text nodes are trimmed.
+// Multi-paragraph definitions are joined with a single space so the inlined
+// span doesn't fuse the paragraphs (e.g. "First.Second.").
 function extractInline(li) {
   const out = [];
+  let emittedGroup = false;
   for (const child of li.children) {
     if (child.type === 'element' && child.tagName === 'p') {
+      if (emittedGroup) out.push({ type: 'text', value: ' ' });
       for (const c of child.children) {
         if (!isBackref(c)) out.push(c);
       }
+      emittedGroup = true;
     } else if (child.type === 'text' && child.value.trim() === '') {
       // Skip whitespace-only text nodes between <li> and its <p> children.
     } else if (!isBackref(child)) {
+      if (emittedGroup) out.push({ type: 'text', value: ' ' });
       out.push(child);
+      emittedGroup = true;
     }
   }
   // Trim trailing whitespace-only text nodes (left by stripping the backref anchor).

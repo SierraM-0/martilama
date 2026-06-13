@@ -44,3 +44,38 @@ test('a post with no footnotes is left untouched', () => {
   assert.doesNotMatch(html, /sidenote/);
   assert.doesNotMatch(html, /margin-toggle/);
 });
+
+function countOccurrences(haystack, needle) {
+  let count = 0;
+  let from = 0;
+  for (;;) {
+    const i = haystack.indexOf(needle, from);
+    if (i === -1) break;
+    count += 1;
+    from = i + needle.length;
+  }
+  return count;
+}
+
+test('a reused footnote reference gets unique ids', () => {
+  const html = render('See[^a] and again[^a].\n\n[^a]: A note.\n');
+  // First reference -> sn-a, second -> sn-a-2.
+  assert.ok(html.includes('id="sn-a"'), 'expected id="sn-a"');
+  assert.ok(html.includes('id="sn-a-2"'), 'expected id="sn-a-2"');
+  // The bare `sn-a"` id must appear exactly once (not duplicated). The second
+  // emission is `sn-a-2"`, which does not contain the substring `sn-a"`.
+  assert.equal(countOccurrences(html, 'id="sn-a"'), 1, 'sn-a id must be unique');
+  // Two sidenote spans, one per reference.
+  assert.equal(
+    countOccurrences(html, '<span class="sidenote">'),
+    2,
+    'expected two sidenote spans'
+  );
+});
+
+test('a multi-paragraph footnote definition is separated by a space', () => {
+  const html = render(
+    'A claim.[^m]\n\n[^m]: First para.\n\n    Second para.\n'
+  );
+  assert.match(html, /First para\. Second para\./);
+});
