@@ -3,7 +3,7 @@ import { renderCard } from '../og/card';
 
 export const GET: APIRoute = async () => {
   const png = await renderCard({
-    title: 'marti',
+    title: 'martilama',
     subtitle: 'Writing about life and my small opinions.',
   });
   return new Response(new Uint8Array(png), {

@@ -34,7 +34,7 @@ export async function renderCard({ title, subtitle, date }: CardOptions): Promis
     <div style="display:flex;flex-direction:column;justify-content:space-between;width:1200px;height:630px;padding:72px;background-color:#faf8f5;color:#2b2722;">
       <div style="display:flex;align-items:center;">
         <img src="${BADGE}" style="width:56px;height:56px;" />
-        <span style="margin-left:18px;font-family:'Mono';font-size:30px;color:#2b2722;letter-spacing:1px;">marti</span>
+        <span style="margin-left:18px;font-family:'Mono';font-size:30px;color:#2b2722;letter-spacing:1px;">martilama</span>
       </div>
       <div style="display:flex;flex-direction:column;">
         <div style="display:flex;font-family:'Fraunces';font-size:72px;font-weight:600;line-height:1.07;color:#2b2722;">${esc(title)}</div>

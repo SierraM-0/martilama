@@ -16,7 +16,7 @@ interface Props {
 }
 
 const { title, description, ogType = "website", ogImage } = Astro.props;
-const siteTitle = "marti";
+const siteTitle = "martilama";
 const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} — personal site`;
 const desc = description ?? "Writing about life and my small opinions.";
 const ogImageUrl = new URL(ogImage ?? '/og-default.png', Astro.site).toString();

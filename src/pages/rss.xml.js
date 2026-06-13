@@ -32,7 +32,7 @@ export async function GET(context) {
   );
 
   return rss({
-    title: "marti's blog",
+    title: "martilama",
     description: 'Writing about life and my small opinions.',
     site: context.site,
     items,
