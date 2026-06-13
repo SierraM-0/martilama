@@ -13,7 +13,7 @@ const dateStr = formatDate(post.data.date);
 const words = (post.body ?? '').trim().split(/\s+/).filter(Boolean).length;
 const minutes = Math.max(1, Math.round(words / 200));
 ---
-<BaseLayout title={post.data.title} description={post.data.description} ogType="article">
+<BaseLayout title={post.data.title} description={post.data.description} ogType="article" ogImage={`/og/${post.id}.png`}>
   <article class="post reveal">
     <h1>{post.data.title}</h1>
     <p class="standfirst">{post.data.description}</p>
