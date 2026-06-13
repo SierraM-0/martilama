@@ -61,20 +61,24 @@ All styles live in `src/styles/global.css` alongside the existing `.post` rules,
 using the existing warm custom properties (`--accent`, `--muted`, `--border`,
 Newsreader body type).
 
-### Wide viewport (min-width: 1024px)
+### Wide viewport (min-width: 1200px)
 
-- True margin notes. `.sidenote { float: right; clear: right; }` pulled into a
-  right-hand gutter via negative `margin-right`, so the note sits beside its
+- True margin notes. `.sidenote { float: right; clear: right; }` pulled into the
+  right-hand whitespace via negative `margin-right`, so the note sits beside its
   sentence and following text flows past it.
-- The post **widens only when a sidenote is present**, gated by
-  `.post:has(.sidenote)`, so note-less posts keep today's exact 700px centered
-  layout with no shift.
-- Target metrics (final values tuned during implementation): text measure
-  ~660px, gutter ~220px, gap ~32px → widened post ~910px, centered.
+- **The post column does not change.** It stays at today's 700px centered width
+  (so the title stays aligned with the nav and footer); notes float into the
+  existing whitespace to the right of that column. The float rule is gated by
+  `.post:has(.sidenote)`, so note-less posts are byte-for-byte unchanged.
+- This is why the breakpoint is 1200px rather than ~1024px: the centered 700px
+  column needs a viewport that wide before the right whitespace is large enough
+  to hold a ~200px note without clipping at the edge.
+- Target metrics (final values tuned during implementation): note width ~200px,
+  pulled ~228px right of the text column (≈28px gap).
 - On wide screens the checkbox/toggle is irrelevant: notes are always visible in
   the margin, and the `<input>`/toggle affordance is hidden.
 
-### Narrow viewport (max-width: 1023px)
+### Narrow viewport (max-width: 1199px)
 
 - No gutter. `.sidenote` is hidden by default.
 - The `.sidenote-number` label shows the superscript number inline and acts as
@@ -123,8 +127,8 @@ and can be refined later (e.g. a feed-specific rendering) if it ever matters.
 
 1. `npm run build` completes green.
 2. Headless Firefox screenshots:
-   - **1280px wide** — margin note rendered in the right gutter, aligned with its
-     sentence; a note-less post still 700px centered.
+   - **≥1200px wide** (e.g. 1320px) — margin note rendered in the right gutter,
+     aligned with its sentence; a note-less post still 700px centered.
    - **390px wide** — number inline, note hidden; then checked state showing the
      note expanded inline.
 3. Confirm a note-less post is visually unchanged from current `main`.
