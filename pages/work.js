@@ -3,7 +3,7 @@ import { BaseLayout } from '../layouts/BaseLayout.js';
 
 export function work({ url }) {
   const body = html`
-    <h1 class="reveal">Work</h1>
+    <h1>Work</h1>
     <p class="standfirst reveal reveal-2">
       What I do as a product specialist — the short, honest version.
     </p>

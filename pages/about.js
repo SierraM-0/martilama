@@ -4,7 +4,7 @@ import { Photo } from '../components/Photo.js';
 
 export function about({ img, url }) {
   const body = html`
-    <h1 class="reveal">About</h1>
+    <h1>About</h1>
     <p class="standfirst reveal reveal-2">
       A product specialist in Tallinn — and the longer version of who's writing here.
     </p>
