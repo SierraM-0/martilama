@@ -1,0 +1,30 @@
+import { html } from '../lib/html.js';
+import { BaseLayout } from '../layouts/BaseLayout.js';
+
+export function work({ url }) {
+  const body = html`
+    <h1 class="reveal">Work</h1>
+    <p class="standfirst reveal reveal-2">
+      What I do as a product specialist — the short, honest version.
+    </p>
+    <div class="prose reveal reveal-3">
+      <p>
+        I work as a product specialist: I care about the gap between what a product
+        is supposed to do and what it actually does for the person in front of it.
+        My background mixes engineering and academic work, and I bring that
+        systems-minded, slightly stubborn attention to detail to product problems.
+      </p>
+      <div class="section-head"><h2 class="section-kicker no-tick">What I focus on</h2></div>
+      <ul>
+        <li>Understanding real user needs over assumed ones.</li>
+        <li>Turning messy problems into clear, decidable trade-offs.</li>
+        <li>Keeping the people using a product at the centre of the work.</li>
+      </ul>
+      <div class="section-head"><h2 class="section-kicker no-tick">Elsewhere</h2></div>
+      <p>
+        For roles, dates, and the formal version, see my
+        <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
+      </p>
+    </div>`;
+  return BaseLayout({ title: 'Work', description: 'What I do as a product specialist.', url, body });
+}
