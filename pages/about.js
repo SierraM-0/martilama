@@ -20,6 +20,12 @@ export function about({ img, url }) {
         This site is where I keep my writing and a little about the work I do. No
         fixed theme — just life and the small opinions I pick up along the way.
       </p>
+
+      <div class="section-head"><h2 class="section-kicker no-tick">How this site is built</h2></div>
+      <p>
+        Built in about a day with Claude Code — a small static-site generator in
+        plain Node.js, no framework. Set in <em>Fraunces</em> and <em>Newsreader</em>.
+      </p>
     </div>`;
   return BaseLayout({ title: 'About', description: 'A little about marti.', url, body });
 }
