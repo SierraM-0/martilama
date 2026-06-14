@@ -533,3 +533,40 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
     position: relative;
   }
 }
+
+/* Self-hosted web fonts (replaces the former @fontsource npm imports). The
+   family names match the existing --font-* custom properties exactly. */
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-opsz-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader Variable';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/newsreader-latin-opsz-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader Variable';
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/newsreader-latin-opsz-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono Variable';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+}
+
+/* Cross-document view transitions (Chromium). Browsers without support fall
+   back to normal instant navigation — nothing breaks. */
+@view-transition {
+  navigation: auto;
+}

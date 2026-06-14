@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://martilama.com/sitemap.xml
