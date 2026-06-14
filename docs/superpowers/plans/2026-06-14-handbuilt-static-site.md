@@ -558,19 +558,20 @@ export const ThemeToggle = () => html`
 
 ```js
 // components/Nav.js
-import { html } from '../lib/html.js';
+// Nested component output is a plain string; wrap in raw() or html`` escapes it.
+import { html, raw } from '../lib/html.js';
 import { Logo } from './Logo.js';
 import { ThemeToggle } from './ThemeToggle.js';
 
 export const Nav = () => html`
   <header class="site-header">
-    <a class="brand" href="/">${Logo({ size: 44 })}<span>martilama</span></a>
+    <a class="brand" href="/">${raw(Logo({ size: 44 }))}<span>martilama</span></a>
     <nav>
       <a href="/blog">blog</a>
       <a href="/work">work</a>
       <a href="/about">about</a>
       <a href="https://github.com/SierraM-0" target="_blank" rel="noopener noreferrer">github</a>
-      ${ThemeToggle()}
+      ${raw(ThemeToggle())}
     </nav>
   </header>`;
 ```
@@ -602,13 +603,13 @@ export const Footer = () => {
 
 ```js
 // components/Photo.js
-import { html } from '../lib/html.js';
+import { html, raw } from '../lib/html.js';
 
 export const Photo = ({ img, alt, caption, wide = false, eager = false }) => html`
   <figure class="photo${wide ? ' photo--wide' : ''}">
     <img src="${img.src}" srcset="${img.srcset}" width="${img.width}" height="${img.height}"
          alt="${alt}" loading="${eager ? 'eager' : 'lazy'}" decoding="async" />
-    ${caption ? html`<figcaption>${caption}</figcaption>` : ''}
+    ${caption ? raw(html`<figcaption>${caption}</figcaption>`) : ''}
   </figure>`;
 ```
 
@@ -1377,4 +1378,5 @@ In the Cloudflare dashboard for the `martilama` project, change the build comman
 - **Run from the repo root** (`~/Documents/Yggdrasil/Asgard/Bragi/site`) for every command.
 - **Commit authorship:** use `git -c user.name="marti" -c user.email="z2bvxdysxt@privaterelay.appleid.com" commit … ` with a trailing `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>` line, matching repo convention.
 - **All work stays on the `handbuilt-rebuild` branch** until parity is confirmed and the user approves merging to `main`.
+- **`html`` `` nesting contract:** `html`` `` returns a plain *string* and escapes every interpolation. Any value that is itself already-built HTML — another component's output, a nested `html`` ``, or `renderMarkdown` output — MUST be wrapped in `raw(...)`, or it will be HTML-escaped into visible markup. Interpolating plain data values (titles, dates, descriptions) without `raw()` is correct — they should be escaped. This applies in components, layouts, and pages alike.
 - **Inline-markdown image optimization is intentionally deferred.** The spec mentions a rehype step to optimize images referenced *inside* posts, but no current post references an image (and the optional `cover` frontmatter is not rendered by any page today), so building it now would add an unused path. If/when a post embeds an image, add a rehype step in `lib/markdown.js` that calls `optimizeImage` for `<img>` srcs — the optimizer already exists. This is a parity-neutral deferral, not a missing feature.
