@@ -1,0 +1,15 @@
+import { html } from '../lib/html.js';
+
+export const Footer = () => {
+  const year = new Date().getFullYear();
+  return html`
+    <footer class="site-footer">
+      <p class="footer-currently">
+        Currently · reading <em>whatever's half-finished on the bedside table</em> · playing <em>Factorio</em>
+      </p>
+      <div class="footer-meta">
+        <span>© ${year} martilama · Forever building.</span>
+        <span><a href="https://github.com/SierraM-0" target="_blank" rel="noopener noreferrer">github</a></span>
+      </div>
+    </footer>`;
+};
