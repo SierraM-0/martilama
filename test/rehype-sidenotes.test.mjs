@@ -5,7 +5,7 @@ import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
-import rehypeSidenotes from '../src/plugins/rehype-sidenotes.js';
+import rehypeSidenotes from '../plugins/rehype-sidenotes.js';
 
 // Mirrors Astro's pipeline: GFM footnotes -> hast -> our transform -> HTML.
 function render(md) {

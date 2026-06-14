@@ -23,12 +23,12 @@ async function main() {
   // 1. async prep
   const posts = await loadPosts();
   const img = {
-    'src/assets/portrait.png': await optimizeImage('src/assets/portrait.png', { widths: [120, 720], dist: DIST }),
+    'assets/portrait.png': await optimizeImage('assets/portrait.png', { widths: [120, 720], dist: DIST }),
   };
 
   // 2. static passthrough
   await fs.cp('public', DIST, { recursive: true });
-  await fs.copyFile('src/styles/global.css', path.join(DIST, 'global.css'));
+  await fs.copyFile('styles/global.css', path.join(DIST, 'global.css'));
 
   // 3. render pages (sync) via the single choke point
   await writePage('/', home({ posts, img, url: u('/') }));

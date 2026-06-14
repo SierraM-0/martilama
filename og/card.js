@@ -3,8 +3,8 @@ import { html } from 'satori-html';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'node:fs';
 
-const fraunces = fs.readFileSync('src/og/fonts/Fraunces-Static.ttf');
-const mono = fs.readFileSync('src/og/fonts/JetBrainsMono-Medium.ttf');
+const fraunces = fs.readFileSync('og/fonts/Fraunces-Static.ttf');
+const mono = fs.readFileSync('og/fonts/JetBrainsMono-Medium.ttf');
 
 // Mannaz badge, hard-coded colours. satori won't rasterize an SVG <img>, so we
 // pre-render the SVG to PNG with resvg and embed that as a data URI instead.

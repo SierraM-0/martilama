@@ -9,7 +9,7 @@ export function about({ img, url }) {
       A product specialist in Tallinn — and the longer version of who's writing here.
     </p>
     <div class="prose reveal reveal-3">
-      ${raw(Photo({ img: img['src/assets/portrait.png'], alt: 'A photo of marti', caption: 'Somewhere in Tallinn.', eager: true }))}
+      ${raw(Photo({ img: img['assets/portrait.png'], alt: 'A photo of marti', caption: 'Somewhere in Tallinn.', eager: true }))}
       <p>
         I'm Marti, a product specialist living in Tallinn, Estonia. I spend my days
         thinking about how products actually serve the people using them — and my

@@ -4,7 +4,7 @@ import { PostCard } from '../components/PostCard.js';
 
 export function home({ posts, img, url }) {
   const recent = posts.slice(0, 5);
-  const p = img['src/assets/portrait.png'];
+  const p = img['assets/portrait.png'];
   const body = html`
     <section class="intro reveal">
       <img class="portrait" src="${p.src}" srcset="${p.srcset}" width="120" height="120"

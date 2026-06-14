@@ -4,21 +4,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "build:hand": "node build.js",
-    "preview:hand": "node serve.mjs",
+    "build": "node build.js",
+    "preview": "node serve.mjs",
     "test": "node --test"
   },
   "dependencies": {
-    "@astrojs/rss": "^4.0.0",
-    "@astrojs/sitemap": "^3.0.0",
-    "@fontsource-variable/fraunces": "^5.2.9",
-    "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "@fontsource-variable/newsreader": "^5.2.10",
     "@resvg/resvg-js": "^2.6.2",
     "@shikijs/rehype": "^1.29.2",
-    "astro": "^5.0.0",
     "gray-matter": "^4.0.3",
     "rehype-raw": "^7.0.0",
     "rehype-stringify": "^10.0.1",
