@@ -46,6 +46,7 @@ export function BaseLayout({ title, description, ogType = 'website', ogImage, ur
     <script src="/js/theme.js"></script>
     <script src="/js/progress.js"></script>
     <script src="/js/clock.js"></script>
+    <script src="/js/router.js"></script>
   </body>
 </html>`;
 }

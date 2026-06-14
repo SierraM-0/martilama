@@ -8,6 +8,7 @@ function updateProgress() {
   const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
   bar.style.width = Math.min(100, Math.max(0, progress * 100)) + '%';
 }
+// Window listeners bind once; `page:load` re-checks after each router swap.
 window.addEventListener('scroll', updateProgress, { passive: true });
 window.addEventListener('resize', updateProgress);
-document.addEventListener('DOMContentLoaded', updateProgress);
+document.addEventListener('page:load', updateProgress);
