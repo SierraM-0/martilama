@@ -315,8 +315,8 @@ const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
   .use(remarkRehype, { allowDangerousHtml: true })
-  .use(rehypeRaw)
   .use(rehypeSidenotes)
+  .use(rehypeRaw)
   .use(rehypeShiki, {
     themes: { light: 'rose-pine-dawn', dark: 'rose-pine-moon' },
     defaultColor: false,
@@ -332,7 +332,7 @@ export async function renderMarkdown(md) {
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `node --test test/markdown.test.mjs`
-Expected: PASS (3 tests). If sidenotes ordering needs the plugin before/after raw, keep `rehypeSidenotes` immediately after `rehypeRaw` as shown.
+Expected: PASS (3 tests). IMPORTANT ordering note: `rehypeSidenotes` MUST run *before* `rehypeRaw`. `rehype-raw` re-parses HTML and turns the boolean `data-footnotes` property into an empty string, which the sidenotes plugin reads as falsy and skips — so the footnotes section would never be rewritten if raw ran first.
 
 - [ ] **Step 5: Commit**
 
