@@ -5,8 +5,8 @@ const FN_PREFIX = 'user-content-fn-';
 
 /**
  * Rewrites remark-gfm footnotes into Tufte sidenotes:
- *   <input type=checkbox class=margin-toggle id=sn-x>
- *   <label class="margin-toggle sidenote-number" for=sn-x>
+ *   <input type=checkbox class=margin-toggle id=sn-x>   (visually hidden)
+ *   <label class="sidenote-number" for=sn-x>            (the visible in-text marker)
  *   <span class=sidenote>...definition...</span>
  * and removes the bottom <section data-footnotes>. No-ops when there are
  * no footnotes.
@@ -58,7 +58,7 @@ export default function rehypeSidenotes() {
         el('input', { type: 'checkbox', id: sid, className: ['margin-toggle'] }),
         el('label', {
           htmlFor: sid,
-          className: ['margin-toggle', 'sidenote-number'],
+          className: ['sidenote-number'],
           'aria-label': 'Toggle sidenote',
         }),
         el('span', { className: ['sidenote'] }, cloneNodes(content)),

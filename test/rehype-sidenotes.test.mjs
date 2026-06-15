@@ -23,8 +23,11 @@ const SAMPLE = 'A claim.[^k]\n\n[^k]: The aside.\n';
 
 test('emits the sidenote triplet for a footnote reference', () => {
   const html = render(SAMPLE);
-  assert.match(html, /<input[^>]*type="checkbox"[^>]*id="sn-k"[^>]*>/);
-  assert.match(html, /class="margin-toggle sidenote-number"/);
+  assert.match(html, /<input[^>]*type="checkbox"[^>]*id="sn-k"[^>]*class="margin-toggle"[^>]*>/);
+  // The inline marker is a label with sidenote-number ONLY. Adding margin-toggle
+  // (the visually-hidden class) here would hide the in-text number — regression guard.
+  assert.match(html, /<label[^>]*class="sidenote-number"[^>]*>/);
+  assert.doesNotMatch(html, /margin-toggle sidenote-number/);
   assert.match(html, /<span class="sidenote">The aside\.<\/span>/);
 });
 
