@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { loadPosts } from './lib/posts.js';
 import { optimizeImage } from './lib/images.js';
 import { writePage, DIST } from './lib/writePage.js';
@@ -29,6 +30,18 @@ async function main() {
   // 2. static passthrough
   await fs.cp('public', DIST, { recursive: true });
   await fs.copyFile('styles/global.css', path.join(DIST, 'global.css'));
+
+  // Asset version stamp — a short content hash of the CSS + JS. BaseLayout
+  // appends it to the /global.css and /js/* URLs as ?v=…, so a deploy that
+  // changes either one yields a new URL and every browser refetches. Without
+  // this, new HTML can pair with a stale, unversioned cached stylesheet.
+  const jsNames = ['theme', 'progress', 'clock', 'router'];
+  const assetBufs = await Promise.all([
+    fs.readFile('styles/global.css'),
+    ...jsNames.map((n) => fs.readFile(`public/js/${n}.js`)),
+  ]);
+  process.env.ASSET_V = crypto.createHash('sha256')
+    .update(Buffer.concat(assetBufs)).digest('hex').slice(0, 8);
 
   // 3. render pages (sync) via the single choke point
   await writePage('/', home({ posts, img, url: u('/') }));

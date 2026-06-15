@@ -9,6 +9,8 @@ export function BaseLayout({ title, description, ogType = 'website', ogImage, ur
   const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} — personal site`;
   const desc = description ?? 'Writing about life and my small opinions.';
   const ogImageUrl = new URL(ogImage ?? '/og-default.png', SITE).toString();
+  // Cache-busting stamp for unversioned assets (set by build.js); empty outside a build.
+  const v = process.env.ASSET_V ? `?v=${process.env.ASSET_V}` : '';
   return html`<!doctype html>
 <html lang="en">
   <head>
@@ -27,7 +29,7 @@ export function BaseLayout({ title, description, ogType = 'website', ogImage, ur
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="${ogImageUrl}" />
     <link rel="alternate" type="application/rss+xml" title="${siteTitle}" href="/rss.xml" />
-    <link rel="stylesheet" href="/global.css" />
+    <link rel="stylesheet" href="/global.css${v}" />
     <script>
       (function () {
         const t = localStorage.getItem('theme')
@@ -51,10 +53,10 @@ export function BaseLayout({ title, description, ogType = 'website', ogImage, ur
       <main>${raw(body)}</main>
       ${raw(Footer())}
     </div>
-    <script src="/js/theme.js"></script>
-    <script src="/js/progress.js"></script>
-    <script src="/js/clock.js"></script>
-    <script src="/js/router.js"></script>
+    <script src="/js/theme.js${v}"></script>
+    <script src="/js/progress.js${v}"></script>
+    <script src="/js/clock.js${v}"></script>
+    <script src="/js/router.js${v}"></script>
   </body>
 </html>`;
 }
