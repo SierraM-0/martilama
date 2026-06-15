@@ -23,8 +23,8 @@ export function about({ img, url }) {
 
       <div class="section-head"><h2 class="section-kicker no-tick">How this site is built</h2></div>
       <p>
-        Built in about a day with Claude Code — a small static-site generator in
-        plain Node.js, no framework. Set in <em>Fraunces</em> and <em>Newsreader</em>.
+        Claude Coded in Node in about a day — a small static-site generator, no
+        framework, no trackers, no cookies. Set in <em>Fraunces</em> and <em>Newsreader</em>.
       </p>
     </div>`;
   return BaseLayout({ title: 'About', description: 'A little about marti.', url, body });

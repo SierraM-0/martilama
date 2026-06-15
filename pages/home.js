@@ -19,8 +19,8 @@ export function home({ posts, img, url }) {
 
     <section class="credo reveal reveal-3">
       <hr class="credo-rule" />
-      <p class="credo-lead">A good tool does more and asks less.</p>
-      <p class="credo-follow">That ease is built, not found — the effort just lives
+      <p class="credo-lead">A good tool does more by asking less.</p>
+      <p class="credo-follow">That ease can be crafted — the effort just lives
         upstream, in the making.</p>
     </section>
 
