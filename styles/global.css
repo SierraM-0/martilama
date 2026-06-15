@@ -473,6 +473,19 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   margin: 0 0 0.9rem;
   font-variation-settings: 'opsz' 40, 'SOFT' 50;
 }
+.about-coda {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.45rem;
+  line-height: 1.4;
+  color: var(--accent);
+  margin: 1.9rem 0 0;
+  font-variation-settings: 'opsz' 40, 'SOFT' 60, 'WONK' 1;
+}
+.about-coda::before {
+  content: '— ';
+  color: var(--muted);
+}
 .post-meta {
   font-family: var(--font-mono);
   font-size: 0.8rem;
