@@ -6,6 +6,14 @@ export function home({ posts, img, url }) {
   const recent = posts.slice(0, 5);
   const p = img['assets/portrait.png'];
   const body = html`
+    <div class="rune-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64" focusable="false" preserveAspectRatio="xMidYMid meet">
+        <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <path d="M21 16 V48" /><path d="M43 16 V48" />
+          <path d="M21 20 L43 34" /><path d="M43 20 L21 34" />
+        </g>
+      </svg>
+    </div>
     <section class="intro reveal">
       <img class="portrait" src="${p.src}" srcset="${p.srcset}" width="120" height="120"
            alt="A photo of marti" loading="eager" fetchpriority="high" decoding="async" />

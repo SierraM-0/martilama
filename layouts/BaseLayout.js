@@ -40,14 +40,6 @@ export function BaseLayout({ title, description, ogType = 'website', ogImage, ur
   </head>
   <body>
     <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
-    <div class="rune-mark" aria-hidden="true">
-      <svg viewBox="0 0 64 64" focusable="false" preserveAspectRatio="xMidYMid meet">
-        <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
-          <path d="M21 16 V48" /><path d="M43 16 V48" />
-          <path d="M21 20 L43 34" /><path d="M43 20 L21 34" />
-        </g>
-      </svg>
-    </div>
     <div class="container">
       ${raw(Nav())}
       <main>${raw(body)}</main>
