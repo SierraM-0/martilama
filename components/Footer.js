@@ -1,15 +1,27 @@
-import { html } from '../lib/html.js';
+import { html, raw } from '../lib/html.js';
+
+const RUNE = html`<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
+    <path d="M21 16 V48" /><path d="M43 16 V48" />
+    <path d="M21 20 L43 34" /><path d="M43 20 L21 34" />
+  </g></svg>`;
 
 export const Footer = () => {
-  const year = new Date().getFullYear();
+  const now = new Date();
+  const year = now.getFullYear();
+  const updated = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   return html`
     <footer class="site-footer">
-      <p class="footer-currently">
-        Currently · reading <em>whatever's half-finished on the bedside table</em> · playing <em>Factorio</em>
-      </p>
-      <div class="footer-meta">
-        <span>© ${year} martilama · Forever building.</span>
-        <span><a href="https://github.com/SierraM-0" target="_blank" rel="noopener noreferrer">github</a></span>
+      <span class="coloph-rune" tabindex="0" role="img"
+            aria-label="Mannaz — the elder-futhark rune for self, and mankind">
+        <span class="rune-tip" aria-hidden="true"><b>Mannaz</b> · self, mankind</span>
+        ${raw(RUNE)}
+      </span>
+      <div class="coloph-text">
+        <p class="coloph-body">Set in <span class="hi">Fraunces</span> &amp; <span class="hi">Newsreader</span>.</p>
+        <p class="coloph-body">Claude Coded in <span class="hi">Node</span> — no framework, no trackers, no cookies.</p>
+        <p class="coloph-meta"><span>© ${year} martilama</span> · <span>updated ${updated}</span> ·
+          <a href="https://github.com/SierraM-0" target="_blank" rel="noopener noreferrer">github</a></p>
       </div>
     </footer>`;
 };

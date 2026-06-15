@@ -67,7 +67,13 @@ body::before {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 0 1.25rem;
+  /* Sticky footer: fill at least the viewport so the footer pins to the bottom
+     on short pages; main takes up the slack. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+.container > main { flex: 1 0 auto; }
 
 a { color: var(--accent); text-decoration: none; transition: color 0.25s ease; }
 a:hover {
@@ -157,19 +163,54 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   .site-header nav a { font-size: 1rem; }
 }
 
+/* Living colophon — a craftsman's plaque + the interactive Mannaz mark. */
 .site-footer {
   border-top: 1px solid var(--border);
   margin-top: 4rem;
   padding: 2rem 0;
   color: var(--muted);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-family: var(--font-mono);
   transition: border-color 0.5s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
 }
 .site-footer a { color: var(--muted); }
-.footer-currently { margin: 0 0 1rem; line-height: 1.6; }
-.footer-currently em { font-style: italic; font-family: var(--font-body); color: var(--text); }
-.footer-meta { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.coloph-rune {
+  position: relative;
+  flex-shrink: 0;
+  line-height: 0;
+  margin-top: 0.1rem;
+  cursor: help;
+}
+.coloph-rune svg { width: 30px; height: 30px; color: var(--accent); opacity: 0.9; display: block; }
+.rune-tip {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 9px);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  transform: translateY(3px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.rune-tip b { color: var(--accent); font-weight: 600; }
+.coloph-rune:hover .rune-tip,
+.coloph-rune:focus .rune-tip { opacity: 1; transform: translateY(0); }
+.coloph-rune:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.coloph-body { margin: 0; line-height: 1.7; color: var(--muted); }
+.coloph-body .hi { color: var(--text); }
+.coloph-meta { margin: 0.55rem 0 0; color: var(--muted); line-height: 1.6; }
+.coloph-meta a { color: var(--muted); }
 
 .theme-toggle {
   display: inline-flex;
@@ -210,6 +251,32 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   transition: width 0.1s linear;
 }
 
+/* Corner sigil — the Mannaz mark, oversized and faint, like a maker's stamp
+   pressed into the paper. Anchored to the *centred column* (not the viewport)
+   via calc(): its right edge tucks a little behind the body's left margin, so
+   it stays intimate with the text at any screen width instead of drifting into
+   the far corner. Fixed + z-index:-1 keeps it a watermark behind the content;
+   purely ornamental (aria-hidden). Only shown ≥1100px, where the gutter opens. */
+.rune-mark { display: none; }
+
+@media (min-width: 1100px) {
+  .rune-mark {
+    display: block;
+    position: fixed;
+    top: 84px;
+    /* column left edge sits at calc(50% - var(--maxw)/2); pull the rune left of
+       it by ~305px so ~55px of its right side tucks behind the column. */
+    left: calc(50% - (var(--maxw) / 2) - 305px);
+    width: 360px;
+    height: 360px;
+    z-index: -1;
+    pointer-events: none;
+    color: var(--text);
+    opacity: 0.07;
+  }
+  .rune-mark svg { width: 100%; height: 100%; display: block; }
+}
+
 /* Home */
 .intro { display: flex; gap: 1.6rem; align-items: center; margin-bottom: 0.6rem; }
 .intro p { margin-bottom: 0; }
@@ -230,6 +297,55 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
   letter-spacing: 0.02em;
   color: var(--muted);
 }
+
+/* Credo — the home's point of view, set apart in display type below the hero */
+.credo { margin: 2.6rem 0 0; }
+.credo-rule { width: 2.4rem; height: 2px; background: var(--accent); border: 0; margin: 0 0 1.2rem; }
+.credo-lead {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.62rem;
+  line-height: 1.34;
+  letter-spacing: -0.012em;
+  margin: 0;
+  max-width: 30ch;
+  color: var(--text);
+  font-variation-settings: 'opsz' 40;
+}
+.credo-follow {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.46rem;
+  line-height: 1.34;
+  letter-spacing: -0.012em;
+  margin: 0.55rem 0 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-variation-settings: 'opsz' 40;
+}
+
+/* "Currently" list — reading / playing, promoted out of the old footer */
+.now-list { margin: 1rem 0 0; }
+.now-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.now-row:last-child { border-bottom: none; }
+.now-label {
+  flex: 0 0 5.5rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.now-val { margin: 0; font-size: 1.06rem; line-height: 1.5; }
+.now-val em { font-style: italic; color: var(--text); }
+.now-val .by { color: var(--muted); }
 
 /* Section heading — quiet kicker bar so post titles stay the focus */
 .section-head {
