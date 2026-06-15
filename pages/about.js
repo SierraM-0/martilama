@@ -11,14 +11,23 @@ export function about({ img, url }) {
     <div class="prose reveal reveal-3">
       ${raw(Photo({ img: img['assets/portrait.png'], alt: 'A photo of marti', caption: 'Somewhere in Tallinn.', eager: true }))}
       <p>
-        I'm Marti, a product specialist living in Tallinn, Estonia. I spend my days
-        thinking about how products actually serve the people using them — and my
-        evenings tinkering with a hand-tuned Linux desktop, reading whatever's
-        half-finished on the bedside table, and playing slow, atmospheric games.
+        I'm Marti, from Albania, in Tallinn since 2019. I came on a scholarship to
+        study engineering, drawn by how far ahead the tech market here already was,
+        and I stayed once the degree was done. The work since has been a steady drift
+        upstream — Customer Support at a fintech while I studied, then minding
+        internal-tooling bug reports, then Product Specialist, and now a kind of
+        gap-filler. I take on whatever the product needs — regulatory requirements for
+        different countries, banking-partner needs, product fixes — gatekeep what
+        ships, change config or write code, so engineering and product can stay focused.
       </p>
       <p>
-        This site is where I keep my writing and a little about the work I do. No
-        fixed theme — just life and the small opinions I pick up along the way.
+        What pulls me is the tinkering itself: changing things, and changing them
+        fast, is the closest thing I have to freedom. So I hand-tune my Linux desktop,
+        wire small scripts together until it runs itself, and poke at code until the
+        web bends a little to what I want. The fast part only works because the edges
+        are rigid — lifting three times a week, two on the weekend; one fixed meal of
+        chicken and rice every day; a Kindle every night before sleep. Tend your own
+        garden, and in time the butterflies arrive on their own. I'm still learning the rest.
       </p>
 
       <div class="section-head"><h2 class="section-kicker no-tick">How this site is built</h2></div>
