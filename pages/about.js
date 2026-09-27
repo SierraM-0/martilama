@@ -12,18 +12,26 @@ export function about({ img, url }) {
       ${raw(Photo({ img: img['assets/about.png'], alt: "Marti standing in a life-size recreation of Van Gogh's bedroom in Arles", caption: "Inside Van Gogh's bedroom, more or less.", eager: true }))}
       <p>
         I'm Marti, from Albania, in Tallinn since 2019. I came on a scholarship to
-        study engineering, but it was the Nordic culture that kept me here. My work at a fintech has drifted steadily upstream, into a kind of
-        connective tissue between engineering and product — I take on whatever they
-        need so they can stay focused on their own work.
+        study engineering, but it was the Nordic culture that kept me here. My work at
+        a fintech has drifted steadily upstream, into product — a kind of connective
+        tissue between engineering and the people it's built for. I work in the space
+        between teams, turning loose ends into decisions so everyone can keep moving.
       </p>
       <p>
-        What pulls me is the tinkering — changing things fast is the closest thing I
-        have to freedom. I hand-tune my Linux desktop and poke at code until the web
-        bends a little to what I want. The fast part only works because the edges are
-        rigid — lifting three times a week, one fixed meal of chicken and rice a day, a
-        Kindle every night. Tend your own garden, and the butterflies arrive on their own.
+        My tinkering is where that instinct started. I hand-tune my Linux desktop and
+        poke at code until the web bends a little to what I want — notice the friction,
+        change something, check whether it actually got better. Changing things fast is
+        the closest thing I have to freedom.
+      </p>
+      <p>
+        The fast part only works because the edges are rigid. I lift three times a
+        week, eat one fixed meal of chicken and rice a day, and read on my Kindle every
+        night. Anything worth building works that way: pin down what shouldn't move, and
+        everything else can move quickly. Tend your own garden, and the butterflies
+        arrive on their own.
       </p>
       <p class="about-coda">I'm still learning the rest.</p>
+      <p>For what I focus on day to day, see <a href="/work">Work</a>.</p>
 
       <div class="section-head"><h2 class="section-kicker no-tick">How this site is built</h2></div>
       <p>
