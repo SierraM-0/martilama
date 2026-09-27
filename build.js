@@ -25,6 +25,7 @@ async function main() {
   const posts = await loadPosts();
   const img = {
     'assets/portrait.png': await optimizeImage('assets/portrait.png', { widths: [120, 720], dist: DIST }),
+    'assets/about.png': await optimizeImage('assets/about.png', { widths: [720, 1440], dist: DIST }),
   };
 
   // 2. static passthrough
