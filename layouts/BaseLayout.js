@@ -7,7 +7,7 @@ const siteTitle = 'martilama';
 
 export function BaseLayout({ title, description, ogType = 'website', ogImage, url, body }) {
   const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} — personal site`;
-  const desc = description ?? 'Writing about life and my small opinions.';
+  const desc = description ?? "Marti's personal site — writing, work, and the odd small opinion.";
   const ogImageUrl = new URL(ogImage ?? '/og-default.png', SITE).toString();
   // Cache-busting stamp for unversioned assets (set by build.js); empty outside a build.
   const v = process.env.ASSET_V ? `?v=${process.env.ASSET_V}` : '';

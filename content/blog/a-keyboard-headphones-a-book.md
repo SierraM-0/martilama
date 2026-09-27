@@ -17,7 +17,7 @@ computer the keyboard is connected to. But once you separate "objects I use" fro
 
 ## The honest part
 
-I think the honest part is that I expected the list to be longer. I have a
+I expected the list to be longer. I have a
 3D printer that hasn't run in more than eight months,[^printer] a small shelf of board
 games, a drawer of cables I keep meaning to sort. None of that made the list.
 Wanting to use a thing isn't the same as reaching for it.
@@ -40,4 +40,4 @@ half-finished on the bedside table.
 
 [^kindle]: It's a Kindle, technically, loaded from a Calibre library I drift through most evenings to pick what's next.
 
-[^printer]: Wanting to use a thing isn't the same as reaching for it — the printer is pure intention.
+[^printer]: It's the most expensive intention I own.

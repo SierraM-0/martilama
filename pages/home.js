@@ -16,10 +16,10 @@ export function home({ posts, img, url }) {
     </div>
     <section class="intro reveal">
       <img class="portrait" src="${p.src}" srcset="${p.srcset}" width="120" height="120"
-           alt="A photo of marti" loading="eager" fetchpriority="high" decoding="async" />
+           alt="Marti sitting in a lecture hall" loading="eager" fetchpriority="high" decoding="async" />
       <div>
         <h1>Hello 👋🏻</h1>
-        <p>I'm Marti — a product specialist based in Tallinn. This is where I write
+        <p>I'm Marti. I work where engineering meets product, and this is where I write
            about life in general and whatever small opinions I happen to be holding.</p>
       </div>
     </section>

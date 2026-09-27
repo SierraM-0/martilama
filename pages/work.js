@@ -5,7 +5,7 @@ export function work({ url }) {
   const body = html`
     <h1>Work</h1>
     <p class="standfirst reveal reveal-2">
-      What I do as a product specialist — the short, honest version.
+      What I do — the short, honest version.
     </p>
     <div class="prose reveal reveal-3">
       <p>
@@ -28,5 +28,5 @@ export function work({ url }) {
         <a href="https://www.linkedin.com/in/marti-lama-mylink" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
       </p>
     </div>`;
-  return BaseLayout({ title: 'Work', description: 'What I do as a product specialist.', url, body });
+  return BaseLayout({ title: 'Work', description: 'What I do, and what I care about doing well.', url, body });
 }

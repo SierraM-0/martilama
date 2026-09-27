@@ -60,7 +60,7 @@ async function main() {
     const png = await renderCard({ title: p.data.title, subtitle: p.data.description, date });
     await writePage(`/og/${p.slug}.png`, png);
   }
-  await writePage('/og-default.png', await renderCard({ title: 'martilama', subtitle: 'Writing about life and my small opinions.' }));
+  await writePage('/og-default.png', await renderCard({ title: 'martilama', subtitle: "Marti's personal site — writing, work, and the odd small opinion." }));
 
   const routes = ['/', '/about', '/work', '/blog', ...posts.map((p) => `/blog/${p.slug}/`)];
   await writePage('/rss.xml', buildRss(posts, SITE));

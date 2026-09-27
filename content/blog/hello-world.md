@@ -19,3 +19,5 @@ No fixed theme — this is just a place to write about life in general and
 the small opinions I pick up along the way.
 
 More soon.
+
+*Update: the site has since been rebuilt as a small hand-written Node generator — no framework.*

@@ -6,7 +6,7 @@ export function about({ img, url }) {
   const body = html`
     <h1>About</h1>
     <p class="standfirst reveal reveal-2">
-      A product specialist in Tallinn — and the longer version of who's writing here.
+      The longer version of who's writing here.
     </p>
     <div class="prose reveal reveal-3">
       ${raw(Photo({ img: img['assets/about.png'], alt: "Marti standing in a life-size recreation of Van Gogh's bedroom in Arles", caption: "Inside Van Gogh's bedroom, more or less.", eager: true }))}
@@ -27,8 +27,7 @@ export function about({ img, url }) {
 
       <div class="section-head"><h2 class="section-kicker no-tick">How this site is built</h2></div>
       <p>
-        Claude Coded in Node in about a day — a small static-site generator, no
-        framework, no trackers, no cookies. Set in <em>Fraunces</em> and <em>Newsreader</em>.
+        A small static-site generator of my own, Claude Coded in Node in about a day.
       </p>
     </div>`;
   return BaseLayout({ title: 'About', description: 'A little about marti.', url, body });
