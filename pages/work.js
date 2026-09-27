@@ -19,11 +19,13 @@ export function work({ url }) {
         <li>Understanding real user needs over assumed ones.</li>
         <li>Turning messy problems into clear, decidable trade-offs.</li>
         <li>Keeping the people using a product at the centre of the work.</li>
+        <li>Building and testing fixes myself when that's the fastest way to learn.</li>
+        <li>Measuring what actually changed, not just what shipped.</li>
       </ul>
       <div class="section-head"><h2 class="section-kicker no-tick">Elsewhere</h2></div>
       <p>
         For roles, dates, and the formal version, see my
-        <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
+        <a href="https://www.linkedin.com/in/marti-lama-mylink" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
       </p>
     </div>`;
   return BaseLayout({ title: 'Work', description: 'What I do as a product specialist.', url, body });
