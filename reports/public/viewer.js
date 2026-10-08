@@ -81,13 +81,18 @@
   const Player = window.rrwebPlayer.default || window.rrwebPlayer.Player || window.rrwebPlayer;
   player = new Player({
     target: mount,
-    props: { events, width, height, autoPlay: false, skipInactive: false, showController: true },
+    // maxScale 0 lifts the player's default cap of 1, so the replay grows to
+    // fill a larger frame (fullscreen, or a big window) instead of stopping
+    // at the visitor's own window size.
+    props: { events, width, height, maxScale: 0, autoPlay: false, skipInactive: false, showController: true },
   });
   const total = Math.max(1, events[events.length - 1].timestamp - events[0].timestamp);
 
   // Re-fit the replay whenever its column changes size.
   let pending = 0;
   const refit = () => {
+    // In fullscreen the player sizes itself to the screen; leave it alone.
+    if (document.fullscreenElement) return;
     cancelAnimationFrame(pending);
     pending = requestAnimationFrame(() => {
       player.$set(fit());
@@ -95,6 +100,7 @@
     });
   };
   window.addEventListener('resize', refit);
+  document.addEventListener('fullscreenchange', () => setTimeout(refit, 50));
   document.getElementById('details').addEventListener('toggle', refit);
 
   // Clicking the replay itself plays or pauses, like a video.

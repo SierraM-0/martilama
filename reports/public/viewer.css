@@ -109,6 +109,7 @@ main.report { padding: 0.75rem 1rem 1rem; animation: arrive 0.3s ease-out; }
 #player .rr-player { float: none; box-shadow: 0 14px 30px -22px rgb(60 40 20 / 0.5); border: 1px solid var(--border); border-radius: 8px; background: var(--panel); overflow: hidden; }
 /* click the replay to play or pause */
 #player .rr-player__frame { cursor: pointer; }
+#player .rr-player:fullscreen { border: 0; border-radius: 0; background: var(--bg); }
 #player .rr-controller { background: var(--panel); color: var(--text); border-radius: 0; font-family: var(--body); }
 #player .rr-timeline__time { color: var(--text); font-variant-numeric: tabular-nums; }
 #player .rr-controller__btns button { color: var(--text); font-family: var(--body); }
