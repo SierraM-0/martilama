@@ -107,12 +107,8 @@ main.report { padding: 0.75rem 1rem 1rem; animation: arrive 0.3s ease-out; }
 
 /* rrweb-player: sit flat in the page and follow the palette */
 #player .rr-player { float: none; box-shadow: 0 14px 30px -22px rgb(60 40 20 / 0.5); border: 1px solid var(--border); border-radius: 8px; background: var(--panel); overflow: hidden; }
-/* click the replay to play or pause; a play mark shows while it is stopped */
-#player .rr-player__frame { position: relative; cursor: pointer; }
-.playhint { position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; background: color-mix(in oklab, var(--text) 62%, transparent); pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 3; }
-.playhint::before { content: ""; position: absolute; left: 27px; top: 20px; border-left: 20px solid var(--bg); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
-#player .rr-player__frame.playing .playhint { opacity: 0; transform: scale(1.25); }
-#player .rr-player__frame:hover .playhint { background: color-mix(in oklab, var(--accent) 85%, transparent); }
+/* click the replay to play or pause */
+#player .rr-player__frame { cursor: pointer; }
 #player .rr-controller { background: var(--panel); color: var(--text); border-radius: 0; font-family: var(--body); }
 #player .rr-timeline__time { color: var(--text); font-variant-numeric: tabular-nums; }
 #player .rr-controller__btns button { color: var(--text); font-family: var(--body); }
@@ -179,5 +175,5 @@ kbd + kbd { margin-left: 0.15rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   main.report { animation: none; }
-  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after, .playhint { transition: none; }
+  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after { transition: none; }
 }

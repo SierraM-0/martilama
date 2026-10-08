@@ -98,16 +98,7 @@
   document.getElementById('details').addEventListener('toggle', refit);
 
   // Clicking the replay itself plays or pauses, like a video.
-  const frame = mount.querySelector('.rr-player__frame');
-  if (frame) {
-    const hint = document.createElement('span');
-    hint.className = 'playhint';
-    frame.append(hint);
-    frame.addEventListener('click', () => player.toggle());
-    player.addEventListener('ui-update-player-state', (e) => {
-      frame.classList.toggle('playing', e.payload === 'playing');
-    });
-  }
+  mount.querySelector('.rr-player__frame')?.addEventListener('click', () => player.toggle());
 
   const sideWidth = () => document.querySelector('.side').getBoundingClientRect().width;
   const commit = (px) => {
