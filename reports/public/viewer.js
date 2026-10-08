@@ -168,7 +168,7 @@
   // console panel
   const items = entries.map((entry) => {
     const li = document.createElement('li');
-    li.className = `entry ${entry.group}`;
+    li.className = `entry ${entry.group} lvl-${entry.level}`;
     const time = document.createElement('time');
     time.textContent = fmt(entry.offset);
     const text = document.createElement('span');
@@ -191,7 +191,7 @@
     if (entry.group === 'log') return null;
     const tick = document.createElement('button');
     tick.type = 'button';
-    tick.className = `mark ${entry.group}`;
+    tick.className = `mark ${entry.group} lvl-${entry.level}`;
     tick.style.left = `${(entry.offset / total) * 100}%`;
     tick.title = `${fmt(entry.offset)}  ${entry.text}`;
     tick.addEventListener('click', (e) => {
@@ -203,7 +203,7 @@
   });
 
   // filters
-  const shown = new Set(['error', 'warning', 'log', 'nav', 'click', 'key']);
+  const shown = new Set(['error', 'warning', 'log', 'nav', 'net', 'click', 'key']);
   const tally = counts(entries);
   const applyFilters = () => {
     let visible = 0;

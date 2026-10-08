@@ -131,6 +131,35 @@ function validateMeta(raw, origins) {
       startedAt: m.startedAt,
       endedAt: m.endedAt,
       encoding: m.encoding,
+      env: cleanEnv(m.env),
     },
   };
+}
+
+// Optional details about the visitor's setup. Each value is checked on its
+// own: anything unknown or malformed is dropped rather than failing the report.
+const text = (max) => (v) => (typeof v === 'string' && v.length > 0 && v.length <= max ? v : undefined);
+const oneOf = (...allowed) => (v) => (allowed.includes(v) ? v : undefined);
+const flag = (v) => (typeof v === 'boolean' ? v : undefined);
+const ENV_FIELDS = {
+  screen: (v) => (v && posInt(v.width) && posInt(v.height) ? { width: v.width, height: v.height } : undefined),
+  pixelRatio: (v) => (Number.isFinite(v) && v > 0 && v <= 10 ? v : undefined),
+  language: text(35),
+  timezone: text(64),
+  colorScheme: oneOf('light', 'dark'),
+  theme: oneOf('light', 'dark'),
+  pointer: oneOf('fine', 'coarse', 'none'),
+  touchPoints: (v) => (Number.isInteger(v) && v >= 0 && v <= 20 ? v : undefined),
+  connection: text(16),
+  online: flag,
+  reducedMotion: flag,
+};
+function cleanEnv(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const out = {};
+  for (const [key, check] of Object.entries(ENV_FIELDS)) {
+    const value = check(raw[key]);
+    if (value !== undefined) out[key] = value;
+  }
+  return Object.keys(out).length ? out : undefined;
 }

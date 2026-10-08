@@ -17,6 +17,7 @@
   }
 
   const FULL = 2;
+  const META = 4;
   const INCREMENTAL = 3;
   const MUTATION = 0;
   const MOUSE_INTERACTION = 2;
@@ -24,6 +25,8 @@
   const ELEMENT_NODE = 2;
   const TEXT_NODE = 3;
   const CLICK_TEXT_MAX = 60;
+  const RESOURCE = { img: 'Image', script: 'Script', link: 'Stylesheet', video: 'Media', audio: 'Media', source: 'Media', iframe: 'Frame' };
+  const duration = (ms) => (ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`);
 
   // Every node the recording ever mentions, by rrweb id, from the full
   // snapshots and the mutations that add nodes. Ids are never reused within a
@@ -96,6 +99,10 @@
     if (!events.length) return [];
     const t0 = events[0].timestamp;
     const nodes = indexNodes(events);
+    // Addresses on the recorded site itself are shown as paths.
+    let site = '';
+    try { site = new URL(events.find((e) => e.type === META)?.data?.href).origin; } catch { /* no usable address */ }
+    const shorten = (url) => (site && url.startsWith(`${site}/`) ? url.slice(site.length) : url);
     const out = [];
     for (const ev of events) {
       const d = ev.data;
@@ -119,6 +126,24 @@
           out.push({ offset, kind: 'report', level: 'info', text: 'Clicked "report a problem"' });
         } else if (d.tag === 'key' && typeof p.combo === 'string') {
           out.push({ offset, kind: 'key', level: 'info', text: `Pressed ${p.combo}` });
+        } else if (d.tag === 'net' && typeof p.method === 'string' && typeof p.url === 'string') {
+          const failed = !(p.status >= 100 && p.status < 400);
+          const result = p.status > 0 ? p.status : 'failed';
+          const took = Number.isFinite(p.ms) ? ` (${duration(p.ms)})` : '';
+          const why = p.status > 0 || typeof p.error !== 'string' ? '' : `: ${p.error}`;
+          out.push({ offset, kind: 'net', level: failed ? 'error' : 'info',
+            text: `${p.method.toUpperCase()} ${shorten(p.url)} → ${result}${took}${why}` });
+        } else if (d.tag === 'resource-error' && typeof p.tag === 'string') {
+          const where = typeof p.url === 'string' && p.url ? `: ${shorten(p.url)}` : '';
+          out.push({ offset, kind: 'net', level: 'error', text: `${RESOURCE[p.tag] || 'Resource'} failed to load${where}` });
+        } else if (d.tag === 'layout-shift' && Number.isFinite(p.value)) {
+          out.push({ offset, kind: 'perf', level: 'warn', text: `Page jumped (layout shift ${p.value.toFixed(2)})` });
+        } else if (d.tag === 'long-task' && Number.isFinite(p.ms)) {
+          out.push({ offset, kind: 'perf', level: 'warn', text: `Page froze for ${Math.round(p.ms)} ms` });
+        } else if (d.tag === 'offline') {
+          out.push({ offset, kind: 'net', level: 'error', text: 'Went offline' });
+        } else if (d.tag === 'online') {
+          out.push({ offset, kind: 'net', level: 'info', text: 'Back online' });
         }
       }
     }
@@ -129,9 +154,11 @@
       .sort((a, b) => a.offset - b.offset);
   }
 
-  // The console filters. Tab and report-click markers count as navigation.
+  // The console filters. Tab and report-click markers count as navigation;
+  // layout shifts and freezes count as warnings.
   function group(entry) {
-    if (entry.kind === 'click' || entry.kind === 'key') return entry.kind;
+    if (entry.kind === 'click' || entry.kind === 'key' || entry.kind === 'net') return entry.kind;
+    if (entry.kind === 'perf') return 'warning';
     if (entry.kind !== 'console') return 'nav';
     if (entry.level === 'error') return 'error';
     if (entry.level === 'warn') return 'warning';
@@ -139,7 +166,7 @@
   }
 
   function counts(entries) {
-    const out = { error: 0, warning: 0, log: 0, nav: 0, click: 0, key: 0 };
+    const out = { error: 0, warning: 0, log: 0, nav: 0, click: 0, key: 0, net: 0 };
     for (const e of entries) out[group(e)] += 1;
     return out;
   }

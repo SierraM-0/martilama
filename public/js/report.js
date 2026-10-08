@@ -102,6 +102,88 @@
     if (combo) custom('key', { combo });
   }, true);
 
+  // Network requests: method, address, status and time. Never bodies or headers.
+  const net = (method, url, status, start, error) => {
+    if (String(url).startsWith(ENDPOINT)) return; // our own upload
+    const payload = { method: String(method).toUpperCase(), url: String(url).slice(0, 300), status, ms: Math.round(performance.now() - start) };
+    if (error) payload.error = String(error).slice(0, 200);
+    custom('net', payload);
+  };
+  if (typeof window.fetch === 'function') {
+    const realFetch = window.fetch;
+    window.fetch = function (input, init) {
+      const start = performance.now();
+      const method = (init && init.method) || (input && input.method) || 'GET';
+      const url = typeof input === 'string' ? new URL(input, location.href).href : (input && input.url) || String(input);
+      const pending = realFetch.apply(this, arguments);
+      pending.then(
+        (res) => net(method, url, res.status, start),
+        (err) => net(method, url, 0, start, err && err.message),
+      );
+      return pending;
+    };
+  }
+  if (typeof XMLHttpRequest === 'function') {
+    const realOpen = XMLHttpRequest.prototype.open;
+    const realSend = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.open = function (method, url) {
+      try { this.__report = { method, url: new URL(url, location.href).href }; } catch { /* odd address */ }
+      return realOpen.apply(this, arguments);
+    };
+    XMLHttpRequest.prototype.send = function () {
+      const info = this.__report;
+      if (info) {
+        const start = performance.now();
+        this.addEventListener('loadend', () => net(info.method, info.url, this.status, start));
+      }
+      return realSend.apply(this, arguments);
+    };
+  }
+
+  // Images, scripts, stylesheets and media that fail to load. These error
+  // events do not bubble, so listen in the capture phase.
+  window.addEventListener('error', (e) => {
+    const el = e.target;
+    if (!(el instanceof Element)) return; // a script error, already in the console
+    custom('resource-error', { tag: el.tagName.toLowerCase(), url: String(el.currentSrc || el.src || el.href || '').slice(0, 300) });
+  }, true);
+
+  // Layout shifts ("the page jumped") and long freezes, where the browser reports them.
+  const watch = (type, onEntry) => {
+    try {
+      if (!PerformanceObserver.supportedEntryTypes.includes(type)) return;
+      new PerformanceObserver((list) => list.getEntries().forEach(onEntry)).observe({ type, buffered: false });
+    } catch { /* not supported */ }
+  };
+  watch('layout-shift', (entry) => {
+    if (!entry.hadRecentInput && entry.value >= 0.02) custom('layout-shift', { value: Math.round(entry.value * 1000) / 1000 });
+  });
+  watch('longtask', (entry) => {
+    if (entry.duration >= 100) custom('long-task', { ms: Math.round(entry.duration) });
+  });
+
+  window.addEventListener('offline', () => custom('offline', {}));
+  window.addEventListener('online', () => custom('online', {}));
+
+  // The visitor's setup, sent with a report: nothing that identifies them.
+  function environment() {
+    const mq = (query) => { try { return matchMedia(query).matches; } catch { return undefined; } };
+    const env = {
+      screen: { width: screen.width, height: screen.height },
+      pixelRatio: Math.round(window.devicePixelRatio * 100) / 100,
+      language: navigator.language,
+      colorScheme: mq('(prefers-color-scheme: dark)') ? 'dark' : 'light',
+      theme: document.documentElement.dataset.theme,
+      pointer: mq('(pointer: coarse)') ? 'coarse' : mq('(pointer: fine)') ? 'fine' : 'none',
+      touchPoints: navigator.maxTouchPoints,
+      online: navigator.onLine,
+      reducedMotion: mq('(prefers-reduced-motion: reduce)'),
+    };
+    try { env.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { /* unavailable */ }
+    if (navigator.connection && navigator.connection.effectiveType) env.connection = navigator.connection.effectiveType;
+    return env;
+  }
+
   // ---- dialog ----
   const form = document.getElementById('report-form');
   const note = document.getElementById('report-note');
@@ -170,6 +252,7 @@
       startedAt: events[0].timestamp,
       endedAt: events[events.length - 1].timestamp,
       encoding,
+      env: environment(),
     };
     const body = new FormData();
     body.append('meta', JSON.stringify(meta));

@@ -144,7 +144,7 @@ test('report page has the console filters', async () => {
   const e = env();
   const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
   const html = await (await get(`/r/${id}`, e)).text();
-  for (const s of ['id="filters"', 'data-filter="error"', 'data-filter="warning"', 'data-filter="log"', 'data-filter="nav"', 'data-filter="click"', 'data-filter="key"']) {
+  for (const s of ['id="filters"', 'data-filter="error"', 'data-filter="warning"', 'data-filter="log"', 'data-filter="nav"', 'data-filter="net"', 'data-filter="click"', 'data-filter="key"']) {
     assert.ok(html.includes(s), s);
   }
 });
@@ -329,4 +329,41 @@ test('report pages have the same clickable brand header, and no separate All rep
   assert.equal(html.split('<h1').length - 1, 1, 'one h1');
   // details still follow the header
   assert.ok(html.indexOf('<details id="details"') > html.indexOf('</header>'));
+});
+
+test('Details shows the environment when the report has it, and nothing extra when it does not', async () => {
+  const e = env();
+  const plain = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const rich = await seed(e.REPORTS, { now: 1_700_000_500_000 });
+  const key = `reports/${rich}/meta.json`;
+  const meta = await (await e.REPORTS.get(key)).json();
+  meta.env = { screen: { width: 2560, height: 1440 }, pixelRatio: 1.5, language: 'et-EE', timezone: 'Europe/Tallinn',
+    colorScheme: 'dark', theme: 'light', pointer: 'fine', touchPoints: 0, connection: '4g', online: true, reducedMotion: true };
+  await e.REPORTS.put(key, JSON.stringify(meta));
+  const html = await (await get(`/r/${rich}`, e)).text();
+  for (const row of [
+    '<dt>Screen</dt><dd>2560 × 1440 at 1.5× pixel ratio</dd>',
+    '<dt>Language</dt><dd>et-EE</dd>',
+    '<dt>Timezone</dt><dd>Europe/Tallinn</dd>',
+    '<dt>Appearance</dt><dd>light on the site, system set to dark, reduced motion</dd>',
+    '<dt>Input</dt><dd>mouse or trackpad</dd>',
+    '<dt>Connection</dt><dd>4g, online</dd>',
+  ]) assert.ok(html.includes(row), row);
+  const old = await (await get(`/r/${plain}`, e)).text();
+  for (const label of ['Screen', 'Language', 'Timezone', 'Appearance', 'Input', 'Connection']) {
+    assert.ok(!old.includes(`<dt>${label}</dt>`), label);
+  }
+});
+
+test('environment text is escaped, and partial details show only what is there', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const key = `reports/${id}/meta.json`;
+  const meta = await (await e.REPORTS.get(key)).json();
+  meta.env = { language: '<b>x</b>', pointer: 'coarse', touchPoints: 5 };
+  await e.REPORTS.put(key, JSON.stringify(meta));
+  const html = await (await get(`/r/${id}`, e)).text();
+  assert.ok(html.includes('<dt>Language</dt><dd>&lt;b&gt;x&lt;/b&gt;</dd>'));
+  assert.ok(html.includes('<dt>Input</dt><dd>touch</dd>'));
+  assert.ok(!html.includes('<dt>Screen</dt>') && !html.includes('<dt>Connection</dt>'));
 });

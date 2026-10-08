@@ -84,8 +84,8 @@ test('group sorts every entry into one of the four console filters', () => {
 
 test('counts totals the entries per filter, including empty filters', () => {
   const out = build([...base, consoleEv(T0 + 1, 'error', ['a']), consoleEv(T0 + 2, 'error', ['b']), customEv(T0 + 3, 'navigate', { path: '/x' })]);
-  assert.deepEqual(counts(out), { error: 2, warning: 0, log: 0, nav: 1, click: 0, key: 0 });
-  assert.deepEqual(counts([]), { error: 0, warning: 0, log: 0, nav: 0, click: 0, key: 0 });
+  assert.deepEqual(counts(out), { error: 2, warning: 0, log: 0, nav: 1, click: 0, key: 0, net: 0 });
+  assert.deepEqual(counts([]), { error: 0, warning: 0, log: 0, nav: 0, click: 0, key: 0, net: 0 });
 });
 
 const { shortcut, stepIndex } = globalThis.ReportEntries;
@@ -265,4 +265,81 @@ test('the click that opened the report dialog is shown once, as the report entry
   const out = build([...withPage, clickEv(T0 + 100, 5), clickEv(T0 + 990, 11), customEv(T0 + 1000, 'report-click')]);
   assert.deepEqual(out.map((e) => e.text), ['Clicked link "blog"', 'Clicked "report a problem"']);
   assert.equal(out[1].kind, 'report');
+});
+
+// ---- network, resources, performance, connectivity ----
+const meta = (href) => ({ type: 4, timestamp: T0, data: { href, width: 1280, height: 720 } });
+const onSite = [meta('https://martilama.com/blog'), { type: 2, timestamp: T0, data: {} }];
+
+test('network requests are listed with method, address, status and time; same-site addresses are shortened', () => {
+  const out = build([
+    ...onSite,
+    customEv(T0 + 100, 'net', { method: 'GET', url: 'https://martilama.com/about?x=1', status: 200, ms: 84.4 }),
+    customEv(T0 + 200, 'net', { method: 'post', url: 'https://api.example.com/v1/thing', status: 201, ms: 1210 }),
+  ]);
+  assert.deepEqual(out.map((e) => [e.kind, e.level, e.text]), [
+    ['net', 'info', 'GET /about?x=1 → 200 (84 ms)'],
+    ['net', 'info', 'POST https://api.example.com/v1/thing → 201 (1.2 s)'],
+  ]);
+  assert.deepEqual(out.map(group), ['net', 'net']);
+});
+
+test('failed requests are errors: bad status, or no response at all', () => {
+  const out = build([
+    ...onSite,
+    customEv(T0 + 100, 'net', { method: 'GET', url: 'https://martilama.com/missing', status: 404, ms: 30 }),
+    customEv(T0 + 200, 'net', { method: 'GET', url: 'https://martilama.com/blog', status: 0, ms: 5000, error: 'NetworkError when attempting to fetch resource.' }),
+  ]);
+  assert.deepEqual(out.map((e) => [e.level, e.text]), [
+    ['error', 'GET /missing → 404 (30 ms)'],
+    ['error', 'GET /blog → failed (5.0 s): NetworkError when attempting to fetch resource.'],
+  ]);
+  assert.deepEqual(out.map(group), ['net', 'net']);
+});
+
+test('resources that failed to load are listed by kind', () => {
+  const out = build([
+    ...onSite,
+    customEv(T0 + 1, 'resource-error', { tag: 'img', url: 'https://martilama.com/assets/portrait.webp' }),
+    customEv(T0 + 2, 'resource-error', { tag: 'script', url: 'https://cdn.example.com/x.js' }),
+    customEv(T0 + 3, 'resource-error', { tag: 'link', url: 'https://martilama.com/global.css' }),
+    customEv(T0 + 4, 'resource-error', { tag: 'video', url: '' }),
+  ]);
+  assert.deepEqual(out.map((e) => [e.kind, e.level, e.text]), [
+    ['net', 'error', 'Image failed to load: /assets/portrait.webp'],
+    ['net', 'error', 'Script failed to load: https://cdn.example.com/x.js'],
+    ['net', 'error', 'Stylesheet failed to load: /global.css'],
+    ['net', 'error', 'Media failed to load'],
+  ]);
+});
+
+test('layout shifts and long freezes are warnings', () => {
+  const out = build([
+    ...base,
+    customEv(T0 + 10, 'layout-shift', { value: 0.1234 }),
+    customEv(T0 + 20, 'long-task', { ms: 418.7 }),
+  ]);
+  assert.deepEqual(out.map((e) => [e.kind, e.level, e.text]), [
+    ['perf', 'warn', 'Page jumped (layout shift 0.12)'],
+    ['perf', 'warn', 'Page froze for 419 ms'],
+  ]);
+  assert.deepEqual(out.map(group), ['warning', 'warning']);
+});
+
+test('going offline and coming back are listed under network', () => {
+  const out = build([...base, customEv(T0 + 10, 'offline'), customEv(T0 + 20, 'online')]);
+  assert.deepEqual(out.map((e) => [e.kind, e.level, e.text]), [['net', 'error', 'Went offline'], ['net', 'info', 'Back online']]);
+  assert.deepEqual(counts(out), { error: 0, warning: 0, log: 0, nav: 0, click: 0, key: 0, net: 2 });
+});
+
+test('malformed network and performance payloads are ignored, not thrown on', () => {
+  const out = build([
+    ...base,
+    customEv(T0 + 1, 'net', {}),
+    customEv(T0 + 2, 'net', { method: 'GET', url: 42 }),
+    customEv(T0 + 3, 'resource-error', { tag: 7 }),
+    customEv(T0 + 4, 'layout-shift', { value: 'big' }),
+    customEv(T0 + 5, 'long-task', {}),
+  ]);
+  assert.deepEqual(out, []);
 });

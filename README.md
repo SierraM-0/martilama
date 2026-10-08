@@ -83,6 +83,18 @@ commands in `docs/superpowers/plans/2026-10-08-problem-report-replay.md`
 `localhost:8787`; without it `wrangler dev` presents requests under the
 production hostname and the local viewer answers 403.
 
+### What a report contains
+
+- The replay: page changes, mouse movement, clicks, scrolling, focus and navigation.
+- Console output and uncaught errors.
+- Key presses that act on the page (Tab, Enter, arrows, Ctrl shortcuts and the
+  like). Typed characters, and anything pressed in a form field, are never recorded.
+- Network requests (method, address, status, time; no bodies or headers),
+  resources that failed to load, and going offline or online.
+- Layout shifts and long freezes, in browsers that report them (Chromium).
+- The visitor's setup: screen, language, timezone, light or dark, input type,
+  connection. No IP address or location is stored.
+
 ### Content blockers
 
 EasyPrivacy (used by uBlock Origin and others) blocks `/rrweb-record.min.js`.

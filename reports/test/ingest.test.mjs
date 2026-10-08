@@ -130,3 +130,37 @@ test('newId sorts newest first', () => {
   assert.ok(newer < older);
   assert.match(older, /^\d{13}-aaaaaaaa$/);
 });
+
+test('environment details are kept when well-formed, and anything unexpected is dropped', async () => {
+  const e = env();
+  const sent = {
+    screen: { width: 2560, height: 1440 }, pixelRatio: 1.5, language: 'et-EE', timezone: 'Europe/Tallinn',
+    colorScheme: 'dark', theme: 'light', pointer: 'fine', touchPoints: 0, connection: '4g', online: true, reducedMotion: false,
+    cookies: 'session=abc', nested: { a: 1 }, language2: 'x'.repeat(500),
+  };
+  const { id } = await (await handleIngest(await req({ meta: goodMeta({ env: sent }) }), e)).json();
+  const meta = await (await e.REPORTS.get(`reports/${id}/meta.json`)).json();
+  assert.deepEqual(meta.env, {
+    screen: { width: 2560, height: 1440 }, pixelRatio: 1.5, language: 'et-EE', timezone: 'Europe/Tallinn',
+    colorScheme: 'dark', theme: 'light', pointer: 'fine', touchPoints: 0, connection: '4g', online: true, reducedMotion: false,
+  });
+});
+
+test('bad environment values are dropped one by one without rejecting the report', async () => {
+  const e = env();
+  const sent = { screen: { width: 'wide', height: 1 }, pixelRatio: 'two', language: 'x'.repeat(200), timezone: 7, online: 'yes', touchPoints: -3, connection: '4g' };
+  const res = await handleIngest(await req({ meta: goodMeta({ env: sent }) }), e);
+  assert.equal(res.status, 201);
+  const { id } = await res.json();
+  const meta = await (await e.REPORTS.get(`reports/${id}/meta.json`)).json();
+  assert.deepEqual(meta.env, { connection: '4g' });
+});
+
+test('a report without environment details, or with a non-object, stores none', async () => {
+  for (const value of [undefined, null, 'string', [1, 2]]) {
+    const e = env();
+    const { id } = await (await handleIngest(await req({ meta: goodMeta({ env: value }) }), e)).json();
+    const meta = await (await e.REPORTS.get(`reports/${id}/meta.json`)).json();
+    assert.equal(meta.env, undefined, JSON.stringify(value));
+  }
+});

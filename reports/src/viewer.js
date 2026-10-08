@@ -112,7 +112,33 @@ const THEME_TOGGLE = `<button type="button" class="theme-toggle" id="theme-toggl
         </svg>
       </button>`;
 
-const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation'], ['click', 'Clicks'], ['key', 'Keys']];
+// Extra Details rows from the visitor's environment, for reports that have it.
+function envRows(env) {
+  if (!env || typeof env !== 'object') return '';
+  const rows = [];
+  const row = (label, value) => { if (value) rows.push(`\n        <div><dt>${label}</dt><dd>${esc(value)}</dd></div>`); };
+  const ratio = env.pixelRatio ? `${env.pixelRatio}× pixel ratio` : '';
+  row('Screen', env.screen ? `${env.screen.width} × ${env.screen.height}${ratio && ` at ${ratio}`}` : ratio);
+  row('Language', env.language);
+  row('Timezone', env.timezone);
+  row('Appearance', [
+    env.theme && `${env.theme} on the site`,
+    env.colorScheme && `system set to ${env.colorScheme}`,
+    env.reducedMotion === true && 'reduced motion',
+  ].filter(Boolean).join(', '));
+  const touch = env.touchPoints > 0;
+  row('Input', env.pointer === 'coarse' ? 'touch'
+    : env.pointer === 'fine' ? `mouse or trackpad${touch ? ', touch screen available' : ''}`
+    : touch ? 'touch' : '');
+  row('Connection', [
+    env.connection,
+    env.online === true && 'online',
+    env.online === false && 'offline',
+  ].filter(Boolean).join(', '));
+  return rows.join('');
+}
+
+const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation'], ['net', 'Network'], ['click', 'Clicks'], ['key', 'Keys']];
 
 async function reportPage(env, id) {
   const m = await readMeta(env, id);
@@ -149,7 +175,7 @@ async function reportPage(env, id) {
         <div><dt>Page</dt><dd>${esc(m.url)}</dd></div>
         <div><dt>Length</dt><dd>${esc(fmtDuration(m.endedAt - m.startedAt))}</dd></div>
         <div><dt>Window</dt><dd>${esc(m.viewport.width)} × ${esc(m.viewport.height)}</dd></div>
-        <div><dt>Browser</dt><dd>${esc(m.userAgent)}</dd></div>
+        <div><dt>Browser</dt><dd>${esc(m.userAgent)}</dd></div>${envRows(m.env)}
       </dl>
     </details>
   </div>
