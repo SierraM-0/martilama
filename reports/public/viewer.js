@@ -47,14 +47,33 @@
   // rrweb needs a Meta + FullSnapshot pair to draw anything.
   if (!Array.isArray(events) || events.length < 2) return fail('This recording is empty.');
 
+  // The split between replay and console is adjustable and remembered.
+  const stage = document.querySelector('.stage');
+  const divider = document.getElementById('divider');
+  const SIDE_KEY = 'reports.sideWidth';
+  const SIDE_MIN = 260;
+  const MAIN_MIN = 380;
+  const setSide = (px) => {
+    const max = Math.max(SIDE_MIN, stage.clientWidth - MAIN_MIN);
+    const width = Math.round(Math.min(max, Math.max(SIDE_MIN, px)));
+    stage.style.setProperty('--side', `${width}px`);
+    return width;
+  };
+  let saved = NaN;
+  try { saved = Number(localStorage.getItem(SIDE_KEY)); } catch { /* storage blocked */ }
+  if (saved > 0) setSide(saved);
+
   // Fit the replay and its controls in the window without scrolling.
   const CONTROLLER = 80; // rrweb-player's control bar
   const BELOW = 48; // key hints + breathing room
   const vw = Number(root.dataset.vw) || 1280;
   const vh = Number(root.dataset.vh) || 720;
-  const width = mount.clientWidth;
-  const room = window.innerHeight - mount.getBoundingClientRect().top - CONTROLLER - BELOW;
-  const height = Math.round(Math.max(240, Math.min(room, width * (vh / vw))));
+  const fit = () => {
+    const width = mount.clientWidth;
+    const room = window.innerHeight - mount.getBoundingClientRect().top - window.scrollY - CONTROLLER - BELOW;
+    return { width, height: Math.round(Math.max(240, Math.min(room, width * (vh / vw)))) };
+  };
+  const { width, height } = fit();
 
   const Player = window.rrwebPlayer.default || window.rrwebPlayer.Player || window.rrwebPlayer;
   player = new Player({
@@ -62,6 +81,51 @@
     props: { events, width, height, autoPlay: false, skipInactive: false, showController: true },
   });
   const total = Math.max(1, events[events.length - 1].timestamp - events[0].timestamp);
+
+  // Re-fit the replay whenever its column changes size.
+  let pending = 0;
+  const refit = () => {
+    cancelAnimationFrame(pending);
+    pending = requestAnimationFrame(() => {
+      player.$set(fit());
+      player.triggerResize();
+    });
+  };
+  window.addEventListener('resize', refit);
+
+  const sideWidth = () => document.querySelector('.side').getBoundingClientRect().width;
+  const commit = (px) => {
+    const applied = setSide(px);
+    refit();
+    try { localStorage.setItem(SIDE_KEY, String(applied)); } catch { /* storage blocked */ }
+  };
+  divider.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    divider.setPointerCapture(e.pointerId);
+    stage.classList.add('dragging'); // lets the pointer pass over the replay iframe
+    const right = stage.getBoundingClientRect().right;
+    const move = (ev) => commit(right - ev.clientX - divider.offsetWidth / 2);
+    const stop = () => {
+      stage.classList.remove('dragging');
+      divider.removeEventListener('pointermove', move);
+      divider.removeEventListener('pointerup', stop);
+      divider.removeEventListener('pointercancel', stop);
+    };
+    divider.addEventListener('pointermove', move);
+    divider.addEventListener('pointerup', stop);
+    divider.addEventListener('pointercancel', stop);
+  });
+  divider.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') commit(sideWidth() + 32);
+    else if (e.key === 'ArrowRight') commit(sideWidth() - 32);
+    else return;
+    e.preventDefault();
+  });
+  divider.addEventListener('dblclick', () => {
+    stage.style.removeProperty('--side');
+    refit();
+    try { localStorage.removeItem(SIDE_KEY); } catch { /* storage blocked */ }
+  });
 
   const fmt = (ms) => {
     const s = Math.max(0, Math.floor(ms / 1000));

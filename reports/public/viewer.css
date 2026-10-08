@@ -84,7 +84,15 @@ main.report { padding: 0.75rem 1rem 1rem; animation: arrive 0.3s ease-out; }
 .facts dt { font-style: italic; color: var(--muted); }
 .facts dd { margin: 0; overflow-wrap: anywhere; }
 
-.stage { display: grid; grid-template-columns: minmax(0, 1fr) 25rem; gap: 1rem; margin-top: 0.75rem; align-items: start; }
+/* replay | divider | console: one block, with the split adjustable */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 12px var(--side, 25rem); margin-top: 0.75rem; align-items: stretch; }
+.stage.dragging { user-select: none; cursor: col-resize; }
+.stage.dragging #player { pointer-events: none; }
+.divider { position: relative; cursor: col-resize; touch-action: none; border-radius: 6px; }
+.divider::before { content: ""; position: absolute; left: 5px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--border); transition: background-color 0.15s, left 0.15s, width 0.15s; }
+.divider::after { content: ""; position: absolute; left: 3px; top: calc(50% - 16px); width: 6px; height: 32px; border-radius: 3px; background: var(--edge); transition: background-color 0.15s; }
+.divider:hover::before, .divider:focus-visible::before, .stage.dragging .divider::before { background: var(--accent); }
+.divider:hover::after, .divider:focus-visible::after, .stage.dragging .divider::after { background: var(--accent); }
 .main { min-width: 0; }
 #player { min-width: 0; color: var(--muted); }
 
@@ -119,7 +127,8 @@ kbd:first-child { margin-left: 0; }
 kbd + kbd { margin-left: 0.15rem; }
 
 /* console panel */
-.side { display: flex; flex-direction: column; min-width: 0; max-height: calc(100vh - 8.5rem); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
+/* height: 0 + min-height: 100% makes the console exactly as tall as the replay column */
+.side { display: flex; flex-direction: column; min-width: 0; height: 0; min-height: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
 .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.55rem; border-bottom: 1px solid var(--border); background: var(--panel); }
 .filters .btn { padding: 0.2rem 0.6rem 0.04rem 0.5rem; font-size: 0.9rem; }
 .filters .btn::before { margin-top: -0.14rem; }
@@ -144,8 +153,9 @@ kbd + kbd { margin-left: 0.15rem; }
 .entry.none { display: block; cursor: default; color: var(--muted); font: italic 0.95rem var(--body); }
 
 @media (max-width: 900px) {
-  .stage { grid-template-columns: minmax(0, 1fr); }
-  .side { max-height: 45vh; }
+  .stage { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+  .divider { display: none; }
+  .side { height: auto; min-height: 0; max-height: 45vh; }
   .top .bar { flex-wrap: wrap; }
   .top .pos { margin-left: 0; }
   .reports .head { display: none; }
@@ -154,5 +164,5 @@ kbd + kbd { margin-left: 0.15rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   main.report { animation: none; }
-  .btn, .entry, .mark::before, .reports a.row { transition: none; }
+  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after { transition: none; }
 }

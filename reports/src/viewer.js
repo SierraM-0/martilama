@@ -109,6 +109,7 @@ async function reportPage(env, id) {
       <div id="player"></div>
       <p class="keys"><kbd>Space</kbd> play or pause <kbd>J</kbd> <kbd>K</kbd> next or previous entry <kbd>[</kbd> <kbd>]</kbd> newer or older report</p>
     </div>
+    <div id="divider" class="divider" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Resize replay and console" title="Drag to resize. Double-click to reset."></div>
     <aside class="side">
       <div id="filters" class="filters">${filters}</div>
       <ol id="log" class="log"></ol>

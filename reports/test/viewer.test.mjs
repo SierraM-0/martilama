@@ -191,3 +191,15 @@ test('report details are a labelled list, one detail per row', async () => {
     assert.ok(dl[1].includes(`<dd>${v}</dd>`), v);
   }
 });
+
+test('report page has a draggable divider between the replay and the console', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const html = await (await get(`/r/${id}`, e)).text();
+  const main = html.indexOf('<div class="main">');
+  const divider = html.indexOf('<div id="divider" class="divider" role="separator" aria-orientation="vertical"');
+  const side = html.indexOf('<aside class="side">');
+  assert.ok(main > 0 && divider > main && side > divider, `order: ${main} ${divider} ${side}`);
+  assert.match(html, /id="divider"[^>]*tabindex="0"/);
+  assert.match(html, /id="divider"[^>]*aria-label="Resize replay and console"/);
+});
