@@ -82,3 +82,11 @@ commands in `docs/superpowers/plans/2026-10-08-problem-report-replay.md`
 `reports/wrangler.toml` has a `[dev]` block pinning the local host to
 `localhost:8787`; without it `wrangler dev` presents requests under the
 production hostname and the local viewer answers 403.
+
+### Content blockers
+
+EasyPrivacy (used by uBlock Origin and others) blocks `/rrweb-record.min.js`.
+For those visitors the recorder never loads, the footer link stays hidden and
+the site works as normal. This is deliberate: the vendored file keeps its
+recognisable name rather than dodging the list. When testing locally, turn
+your blocker off for `localhost:4321` or the link will not appear.
