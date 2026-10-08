@@ -57,6 +57,7 @@ async function listPage(env) {
     </ol>
   </div>`;
   const body = `<main class="list">
+  ${RUNE_MARK}
   <header class="site-header">
     <h1 class="brand"><a href="/">
       ${LOGO}
@@ -81,6 +82,17 @@ const LOGO = `<svg class="logo" width="44" height="44" viewBox="0 0 64 64" aria-
   <path d="M35 34 H50" stroke="var(--bg)" stroke-width="7" stroke-linecap="round"/>
   <path d="M14 49 H50" stroke="var(--bg)" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
 </svg>`;
+
+// The site's corner sigil: the Mannaz rune, oversized and faint, behind the
+// content. Same drawing as on martilama.com's home page.
+const RUNE_MARK = `<div class="rune-mark" aria-hidden="true">
+    <svg viewBox="0 0 64 64" focusable="false" preserveAspectRatio="xMidYMid meet">
+      <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+        <path d="M21 16 V48" /><path d="M43 16 V48" />
+        <path d="M21 20 L43 34" /><path d="M43 20 L21 34" />
+      </g>
+    </svg>
+  </div>`;
 
 // The same sun and moon toggle as martilama.com.
 const THEME_TOGGLE = `<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch between light and dark" title="Switch between light and dark">

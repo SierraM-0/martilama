@@ -295,3 +295,18 @@ test('every page loads the theme script before the stylesheet, and has the toggl
     assert.equal(html.split('id="theme-toggle"').length - 1, 1, `${path}: one toggle`);
   }
 });
+
+test("the list page has the site's faint Mannaz mark in the background, and report pages do not", async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const list = await (await get('/', e)).text();
+  const mark = list.match(/<div class="rune-mark" aria-hidden="true">([\s\S]*?)<\/div>/);
+  assert.ok(mark, 'rune mark');
+  for (const d of ['M21 16 V48', 'M43 16 V48', 'M21 20 L43 34', 'M43 20 L21 34']) assert.ok(mark[1].includes(d), d);
+  assert.ok(mark[1].includes('stroke="currentColor"') && mark[1].includes('stroke-width="3"'));
+  assert.ok(!(await (await get(`/r/${id}`, e)).text()).includes('rune-mark'), 'not on report pages');
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('../public/viewer.css', import.meta.url), 'utf8');
+  assert.match(css, /\.rune-mark \{ display: none; \}/);
+  assert.match(css, /@media \(min-width: 1100px\) \{\s*\.rune-mark \{[^}]*width: 360px;[^}]*opacity: 0\.07;/);
+});
