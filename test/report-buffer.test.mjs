@@ -88,3 +88,44 @@ test('freeze does not mutate; second freeze uses the later marker', () => {
   buf.push(inc(5000));
   assert.deepEqual(buf.freeze(6000).map((e) => e.timestamp), [0, 0, 1100, 5000]);
 });
+
+const { describeKey } = globalThis.ReportBuffer;
+const k = (key, mods = {}) => ({ key, ctrlKey: false, altKey: false, metaKey: false, shiftKey: false, repeat: false, typing: false, ...mods });
+
+test('describeKey: navigation and control keys are named', () => {
+  assert.equal(describeKey(k('Tab')), 'Tab');
+  assert.equal(describeKey(k('Enter')), 'Enter');
+  assert.equal(describeKey(k('Escape')), 'Escape');
+  assert.equal(describeKey(k(' ')), 'Space');
+  assert.equal(describeKey(k('ArrowDown')), 'ArrowDown');
+  assert.equal(describeKey(k('PageUp')), 'PageUp');
+  assert.equal(describeKey(k('F5')), 'F5');
+  assert.equal(describeKey(k('F12')), 'F12');
+  assert.equal(describeKey(k('Tab', { shiftKey: true })), 'Shift+Tab');
+  assert.equal(describeKey(k('ArrowLeft', { altKey: true })), 'Alt+ArrowLeft');
+});
+
+test('describeKey: Ctrl and Cmd shortcuts are recorded as combinations', () => {
+  assert.equal(describeKey(k('r', { ctrlKey: true })), 'Ctrl+R');
+  assert.equal(describeKey(k('F', { ctrlKey: true, shiftKey: true })), 'Ctrl+Shift+F');
+  assert.equal(describeKey(k('c', { metaKey: true })), 'Meta+C');
+  assert.equal(describeKey(k('+', { ctrlKey: true })), 'Ctrl++');
+});
+
+test('describeKey: typed characters are never recorded', () => {
+  for (const key of ['a', 'Z', '7', '.', 'õ', '[']) assert.equal(describeKey(k(key)), null, key);
+  assert.equal(describeKey(k('A', { shiftKey: true })), null);
+  // AltGr (Ctrl+Alt) and Option (Alt) produce typed symbols on many layouts
+  assert.equal(describeKey(k('[', { ctrlKey: true, altKey: true })), null);
+  assert.equal(describeKey(k('å', { altKey: true })), null);
+});
+
+test('describeKey: nothing is recorded while typing in a field, on repeat, or for bare modifiers', () => {
+  assert.equal(describeKey(k('Enter', { typing: true })), null);
+  assert.equal(describeKey(k('a', { ctrlKey: true, typing: true })), null);
+  assert.equal(describeKey(k('ArrowDown', { repeat: true })), null);
+  for (const key of ['Control', 'Shift', 'Alt', 'Meta', 'AltGraph', 'CapsLock', 'Dead', 'Unidentified']) {
+    assert.equal(describeKey(k(key, { ctrlKey: key === 'Control' })), null, key);
+  }
+  assert.equal(describeKey(k(undefined)), null);
+});

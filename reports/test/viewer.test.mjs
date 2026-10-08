@@ -144,7 +144,7 @@ test('report page has the console filters', async () => {
   const e = env();
   const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
   const html = await (await get(`/r/${id}`, e)).text();
-  for (const s of ['id="filters"', 'data-filter="error"', 'data-filter="warning"', 'data-filter="log"', 'data-filter="nav"']) {
+  for (const s of ['id="filters"', 'data-filter="error"', 'data-filter="warning"', 'data-filter="log"', 'data-filter="nav"', 'data-filter="click"', 'data-filter="key"']) {
     assert.ok(html.includes(s), s);
   }
 });

@@ -84,8 +84,8 @@ test('group sorts every entry into one of the four console filters', () => {
 
 test('counts totals the entries per filter, including empty filters', () => {
   const out = build([...base, consoleEv(T0 + 1, 'error', ['a']), consoleEv(T0 + 2, 'error', ['b']), customEv(T0 + 3, 'navigate', { path: '/x' })]);
-  assert.deepEqual(counts(out), { error: 2, warning: 0, log: 0, nav: 1 });
-  assert.deepEqual(counts([]), { error: 0, warning: 0, log: 0, nav: 0 });
+  assert.deepEqual(counts(out), { error: 2, warning: 0, log: 0, nav: 1, click: 0, key: 0 });
+  assert.deepEqual(counts([]), { error: 0, warning: 0, log: 0, nav: 0, click: 0, key: 0 });
 });
 
 const { shortcut, stepIndex } = globalThis.ReportEntries;
@@ -206,4 +206,63 @@ test('shortcut: arrows that already mean something are left alone', () => {
   // and never while typing, where Shift+arrows select text
   assert.equal(shortcut(press('ArrowRight', { typing: true })), null);
   assert.equal(shortcut(press('ArrowLeft', { shiftKey: true, typing: true })), null);
+});
+
+// ---- key presses and clicks ----
+const el = (id, tagName, attributes, childNodes = []) => ({ type: 2, id, tagName, attributes, childNodes });
+const text = (id, textContent) => ({ type: 3, id, textContent });
+// document > html > body > [nav > a"blog", main > (p"Posts about life", button"report a problem", div(empty))]
+const page = { type: 0, id: 1, childNodes: [el(2, 'html', {}, [el(3, 'body', {}, [
+  el(4, 'nav', {}, [el(5, 'a', { href: '/blog' }, [text(6, 'blog')])]),
+  el(7, 'main', {}, [
+    el(8, 'p', {}, [text(9, '  Posts about life\n   and my small opinions.  ')]),
+    el(10, 'button', { id: 'report-link' }, [text(11, 'report a problem')]),
+    el(12, 'div', { class: 'spacer' }),
+  ]),
+])])] };
+const withPage = [{ type: 4, timestamp: T0, data: {} }, { type: 2, timestamp: T0, data: { node: page } }];
+const clickEv = (t, id) => ({ type: 3, timestamp: t, data: { source: 2, type: 2, id, x: 10, y: 10 } });
+
+test('key presses become entries', () => {
+  const out = build([...base, customEv(T0 + 100, 'key', { combo: 'Tab' }), customEv(T0 + 200, 'key', { combo: 'Ctrl+R' })]);
+  assert.deepEqual(out.map((e) => [e.offset, e.kind, e.text]), [[100, 'key', 'Pressed Tab'], [200, 'key', 'Pressed Ctrl+R']]);
+  assert.deepEqual(out.map(group), ['key', 'key']);
+});
+
+test('clicks say what was clicked: link, button, text, or bare element', () => {
+  const out = build([...withPage, clickEv(T0 + 100, 6), clickEv(T0 + 200, 5), clickEv(T0 + 300, 9), clickEv(T0 + 400, 12)]);
+  assert.deepEqual(out.map((e) => [e.offset, e.kind, e.text]), [
+    [100, 'click', 'Clicked link "blog"'],
+    [200, 'click', 'Clicked link "blog"'],
+    [300, 'click', 'Clicked "Posts about life and my small opinions."'],
+    [400, 'click', 'Clicked <div>'],
+  ]);
+  assert.deepEqual(out.map(group), ['click', 'click', 'click', 'click']);
+});
+
+test('clicks on elements added after the first snapshot are described too', () => {
+  const add = { type: 3, timestamp: T0 + 50, data: { source: 0, adds: [
+    { parentId: 7, nextId: null, node: el(20, 'a', { href: '/blog/hello' }, []) },
+    { parentId: 20, nextId: null, node: text(21, 'Hello, world') },
+  ], removes: [], texts: [], attributes: [] } };
+  const out = build([...withPage, add, clickEv(T0 + 100, 21)]);
+  assert.equal(out[0].text, 'Clicked link "Hello, world"');
+});
+
+test('long click text is cut short, and an unknown element still gets an entry', () => {
+  const long = { type: 0, id: 1, childNodes: [el(2, 'p', {}, [text(3, 'x'.repeat(200))])] };
+  const out = build([{ type: 4, timestamp: T0, data: {} }, { type: 2, timestamp: T0, data: { node: long } }, clickEv(T0 + 1, 3), clickEv(T0 + 2, 999)]);
+  assert.equal(out[0].text, `Clicked "${'x'.repeat(60)}…"`);
+  assert.equal(out[1].text, 'Clicked');
+});
+
+test('other mouse interactions (down, up, focus) are not listed', () => {
+  const others = [0, 1, 3, 5, 6].map((type, i) => ({ type: 3, timestamp: T0 + i, data: { source: 2, type, id: 5 } }));
+  assert.deepEqual(build([...withPage, ...others]), []);
+});
+
+test('the click that opened the report dialog is shown once, as the report entry', () => {
+  const out = build([...withPage, clickEv(T0 + 100, 5), clickEv(T0 + 990, 11), customEv(T0 + 1000, 'report-click')]);
+  assert.deepEqual(out.map((e) => e.text), ['Clicked link "blog"', 'Clicked "report a problem"']);
+  assert.equal(out[1].kind, 'report');
 });

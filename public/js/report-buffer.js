@@ -60,5 +60,25 @@
     return { ...ev, timestamp: markerTime, data: { ...d, positions } };
   }
 
-  g.ReportBuffer = { create };
+  // Which key presses are recorded, and under what name. Only keys that do
+  // something to the page are kept: navigation and control keys, function
+  // keys, and Ctrl/Cmd shortcuts. Characters being typed are never recorded,
+  // nor is anything pressed inside a form field, so this cannot capture text.
+  const NAMED_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Escape',
+    'PageUp', 'PageDown', 'Home', 'End', 'Backspace', 'Delete'];
+  function describeKey({ key, ctrlKey, altKey, metaKey, shiftKey, repeat, typing }) {
+    if (typing || repeat || typeof key !== 'string') return null;
+    const named = NAMED_KEYS.includes(key) || key === ' ' || /^F\d{1,2}$/.test(key);
+    if (!named) {
+      // A single character counts only as part of a Ctrl or Cmd shortcut.
+      // Ctrl+Alt together is AltGr, and Alt alone is Option: both type symbols.
+      if (key.length !== 1) return null; // bare modifiers, dead keys, media keys
+      if (!(ctrlKey || metaKey) || (ctrlKey && altKey)) return null;
+    }
+    const name = key === ' ' ? 'Space' : key.length === 1 ? key.toUpperCase() : key;
+    const mods = [ctrlKey && 'Ctrl', altKey && 'Alt', shiftKey && 'Shift', metaKey && 'Meta'].filter(Boolean);
+    return [...mods, name].join('+');
+  }
+
+  g.ReportBuffer = { create, describeKey };
 })(globalThis);

@@ -91,6 +91,17 @@
 
   document.addEventListener('page:load', () => custom('navigate', { path: location.pathname }));
 
+  // Key presses that act on the page (never typed characters; see describeKey).
+  document.addEventListener('keydown', (e) => {
+    const el = e.target instanceof Element ? e.target : null;
+    const combo = window.ReportBuffer.describeKey({
+      key: e.key, ctrlKey: e.ctrlKey, altKey: e.altKey, metaKey: e.metaKey, shiftKey: e.shiftKey,
+      repeat: e.repeat,
+      typing: !!el?.closest('input, textarea, select, [contenteditable], .rr-block'),
+    });
+    if (combo) custom('key', { combo });
+  }, true);
+
   // ---- dialog ----
   const form = document.getElementById('report-form');
   const note = document.getElementById('report-note');

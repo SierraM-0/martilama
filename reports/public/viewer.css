@@ -175,6 +175,7 @@ main.report { padding: 0 1rem 1rem; animation: arrive 0.3s ease-out; }
 .marks { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .mark { position: absolute; top: -9px; width: 11px; height: 22px; padding: 0; transform: translateX(-5.5px); border: 0; background: none; cursor: pointer; pointer-events: auto; }
 .mark::before { content: ""; position: absolute; left: 4px; top: 4px; bottom: 4px; width: 3px; border-radius: 1.5px; background: var(--muted); transition: top 0.15s, bottom 0.15s, left 0.15s, width 0.15s; }
+.mark.click::before, .mark.key::before { top: 6px; bottom: 6px; width: 2px; left: 4.5px; }
 .mark.warning::before { background: var(--warn); top: 2px; bottom: 2px; }
 .mark.error::before { background: var(--error); top: 0; bottom: 0; }
 .mark:hover::before, .mark.on::before { top: -2px; bottom: -2px; left: 3px; width: 5px; }
@@ -196,6 +197,7 @@ kbd + kbd { margin-left: 0.15rem; }
 .filters [data-filter="error"]::before { border-color: var(--error); background: var(--error); }
 .filters [data-filter="warning"]::before { border-color: var(--warn); background: var(--warn); }
 .filters [data-filter="nav"]::before { border-color: var(--accent); background: var(--accent); }
+.filters [data-filter="click"]::before, .filters [data-filter="key"]::before { border-color: var(--text); background: var(--text); }
 .filters .btn[aria-pressed="false"] { background: transparent; box-shadow: none; color: var(--muted); border-style: dashed; }
 .filters .btn[aria-pressed="false"]::before { background: transparent; }
 .filters .n { font-variant-numeric: tabular-nums; color: var(--muted); }
@@ -207,7 +209,8 @@ kbd + kbd { margin-left: 0.15rem; }
 .entry span { overflow-wrap: anywhere; white-space: pre-wrap; }
 .entry.warning span { color: var(--warn); }
 .entry.error span { color: var(--error); }
-.entry.nav span { font: italic 0.95rem/1.3 var(--body); color: var(--muted); }
+.entry.nav span, .entry.click span, .entry.key span { font: italic 0.95rem/1.3 var(--body); color: var(--muted); }
+.entry.click span, .entry.key span { color: var(--text); }
 .entry.current { background: var(--panel); border-left-color: var(--accent); }
 .entry.none { display: block; cursor: default; color: var(--muted); font: italic 0.95rem var(--body); }
 

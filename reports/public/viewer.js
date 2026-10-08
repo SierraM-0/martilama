@@ -203,7 +203,7 @@
   });
 
   // filters
-  const shown = new Set(['error', 'warning', 'log', 'nav']);
+  const shown = new Set(['error', 'warning', 'log', 'nav', 'click', 'key']);
   const tally = counts(entries);
   const applyFilters = () => {
     let visible = 0;

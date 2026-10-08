@@ -112,7 +112,7 @@ const THEME_TOGGLE = `<button type="button" class="theme-toggle" id="theme-toggl
         </svg>
       </button>`;
 
-const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation']];
+const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation'], ['click', 'Clicks'], ['key', 'Keys']];
 
 async function reportPage(env, id) {
   const m = await readMeta(env, id);
