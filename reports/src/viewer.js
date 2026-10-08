@@ -65,13 +65,14 @@ async function listPage(env) {
   return htmlPage({ title: 'Problem reports', body, siteOrigins: allowedOrigins(env) });
 }
 
-// The site's Mannaz mark, as on martilama.com.
+// The service's mark: a console prompt over a log line. Same drawing as
+// public/favicon.svg, here in the page's own colours.
 const LOGO = `<svg class="logo" width="40" height="40" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-      <rect x="3" y="3" width="58" height="58" rx="18" fill="var(--accent)" />
-      <g fill="none" stroke="var(--bg)" stroke-width="5" stroke-linecap="round">
-        <path d="M21 19 V45" /><path d="M43 19 V45" /><path d="M21 22 L43 34" /><path d="M43 22 L21 34" />
-      </g>
-    </svg>`;
+  <rect x="3" y="3" width="58" height="58" rx="18" fill="var(--accent)"/>
+  <path d="M14 14 L24.5 24 L14 34" fill="none" stroke="var(--bg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M35 34 H50" stroke="var(--bg)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M14 49 H50" stroke="var(--bg)" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+</svg>`;
 
 const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation']];
 

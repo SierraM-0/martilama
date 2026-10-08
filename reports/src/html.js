@@ -35,6 +35,7 @@ export function htmlPage({ title, body, siteOrigins, status = 200 }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>${esc(title)}</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/viewer.css">
 </head>
 <body>

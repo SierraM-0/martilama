@@ -232,3 +232,34 @@ test('a report without a note says so in the same place', async () => {
   const html = await (await get(`/r/${id}`, e)).text();
   assert.ok(html.includes('<p class="note" id="note"><em>The visitor left no note.</em></p>'));
 });
+
+test('every page links the favicon', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const link = '<link rel="icon" href="/favicon.svg" type="image/svg+xml">';
+  assert.ok((await (await get('/', e)).text()).includes(link), 'list');
+  assert.ok((await (await get(`/r/${id}`, e)).text()).includes(link), 'report');
+  assert.ok((await (await get('/r/0000000000000-00000000', e)).text()).includes(link), 'not found');
+});
+
+test('the favicon file is the console-prompt mark', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const svg = await readFile(new URL('../public/favicon.svg', import.meta.url), 'utf8');
+  assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="0 0 64 64">/);
+  assert.ok(svg.includes('M14 14 L24.5 24 L14 34'), 'prompt arrow');
+  assert.ok(!/<script|href=|url\(/i.test(svg), 'self-contained');
+});
+
+test('the list page shows the same mark beside the name', async () => {
+  const html = await (await get('/', env())).text();
+  const logo = html.match(/<svg class="logo"[\s\S]*?<\/svg>/);
+  assert.ok(logo && logo[0].includes('M14 14 L24.5 24 L14 34'), 'prompt arrow in masthead');
+});
+
+test("the report page's note styling does not leak into the list's note column", async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('../public/viewer.css', import.meta.url), 'utf8');
+  // The list rows also use class="note"; the label and heading font belong to #note only.
+  assert.ok(!/^\.note\b/m.test(css), 'no bare .note rule');
+  assert.match(css, /^#note::before \{ content: "Visitor's note"/m);
+});
