@@ -85,8 +85,8 @@ main.list { max-width: 70rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
 .top .theme-toggle { margin-left: 0.25rem; }
 .site-header nav a { color: var(--text); font-size: 1.06rem; background-image: linear-gradient(var(--accent), var(--accent)); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.3s ease, color 0.25s ease; }
 .site-header nav a:hover { color: var(--accent); background-size: 100% 2px; text-decoration: none; }
-/* Corner sigil, as on martilama.com: same size, height on the page and
-   faintness. There it tucks ~55px behind the left edge of the text column;
+/* Corner sigil, placed as martilama.com places its rune (here it is this
+   service's own mark): same size, height on the page and faintness. There it tucks ~55px behind the left edge of the text column;
    this column is wider (70rem), so on ordinary screens it would fall off the
    left edge. max() keeps most of it on screen, sitting behind the list. */
 .rune-mark { display: none; }

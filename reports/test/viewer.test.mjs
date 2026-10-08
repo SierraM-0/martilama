@@ -296,14 +296,16 @@ test('every page loads the theme script before the stylesheet, and has the toggl
   }
 });
 
-test("the list page has the site's faint Mannaz mark in the background, and report pages do not", async () => {
+test("the list page has the service's own mark, faint, in the background, and report pages do not", async () => {
   const e = env();
   const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
   const list = await (await get('/', e)).text();
   const mark = list.match(/<div class="rune-mark" aria-hidden="true">([\s\S]*?)<\/div>/);
-  assert.ok(mark, 'rune mark');
-  for (const d of ['M21 16 V48', 'M43 16 V48', 'M21 20 L43 34', 'M43 20 L21 34']) assert.ok(mark[1].includes(d), d);
-  assert.ok(mark[1].includes('stroke="currentColor"') && mark[1].includes('stroke-width="3"'));
+  assert.ok(mark, 'background mark');
+  // the console prompt, its cursor and the log line, as in the logo
+  for (const d of ['M14 14 L24.5 24 L14 34', 'M35 34 H50', 'M14 49 H50']) assert.ok(mark[1].includes(d), d);
+  assert.ok(!mark[1].includes('M21 16 V48'), 'not the Mannaz rune');
+  assert.ok(mark[1].includes('stroke="currentColor"') && !mark[1].includes('<rect'), 'outline only');
   assert.ok(!(await (await get(`/r/${id}`, e)).text()).includes('rune-mark'), 'not on report pages');
   const { readFile } = await import('node:fs/promises');
   const css = await readFile(new URL('../public/viewer.css', import.meta.url), 'utf8');
