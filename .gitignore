@@ -6,3 +6,5 @@ node_modules/
 .env
 .env.local
 .env.production
+reports/.dev.vars
+reports/.wrangler/

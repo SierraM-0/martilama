@@ -1,0 +1,23 @@
+name = "martilama-reports"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+routes = [{ pattern = "reports.martilama.com", custom_domain = true }]
+
+[assets]
+directory = "./public"
+
+[[r2_buckets]]
+binding = "REPORTS"
+bucket_name = "martilama-reports"
+
+[[ratelimits]]
+name = "INGEST_LIMITER"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }
+
+[vars]
+ALLOWED_ORIGINS = "https://martilama.com"
+# Fill both in after creating the Access application (README, "Reports").
+# While either is empty the viewer answers 403 to everyone.
+ACCESS_TEAM_DOMAIN = ""
+ACCESS_AUD = ""
