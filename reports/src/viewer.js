@@ -42,18 +42,19 @@ const pathOf = (url) => {
 
 async function listPage(env) {
   const metas = await listMetas(env);
+  // Each row is a single link, so the whole row is clickable.
   const rows = metas.map((m) => `
-      <tr>
-        <td class="when"><a href="/r/${esc(m.id)}">${esc(fmtDate(m.receivedAt))}</a></td>
-        <td class="page">${esc(pathOf(m.url))}</td>
-        <td class="note">${esc(m.note) || '<em>No note</em>'}</td>
-        <td class="dur">${esc(fmtDuration(m.endedAt - m.startedAt))}</td>
-      </tr>`).join('');
-  const table = `<table class="reports">
-    <thead><tr><th>Received</th><th>Page</th><th>Note</th><th class="dur">Length</th></tr></thead>
-    <tbody>${rows}
-    </tbody>
-  </table>`;
+    <li><a class="row" href="/r/${esc(m.id)}">
+      <span class="when">${esc(fmtDate(m.receivedAt))}</span>
+      <span class="page">${esc(pathOf(m.url))}</span>
+      <span class="note">${esc(m.note) || '<em>No note</em>'}</span>
+      <span class="dur">${esc(fmtDuration(m.endedAt - m.startedAt))}</span>
+    </a></li>`).join('');
+  const table = `<div class="reports">
+    <div class="row head" aria-hidden="true"><span>Received</span><span>Page</span><span>Note</span><span class="dur">Length</span></div>
+    <ol>${rows}
+    </ol>
+  </div>`;
   const body = `<main class="list">
   <header class="masthead">
     ${LOGO}

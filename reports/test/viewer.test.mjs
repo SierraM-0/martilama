@@ -168,3 +168,13 @@ test('newer and older are marked up as buttons, with a disabled look at the ends
   assert.ok(html.includes(`<a id="older" href="/r/${oldest}" class="btn">`));
   assert.ok(html.includes('<span class="btn off" aria-disabled="true">Newer</span>'));
 });
+
+test('each list row is one link wrapping the date, page, note and length', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000, note: 'whole row' });
+  const html = await (await get('/', e)).text();
+  const row = html.match(new RegExp(`<a class="row" href="/r/${id}">([\\s\\S]*?)</a>`));
+  assert.ok(row, 'row link');
+  for (const part of ['2023-11-14 22:13 UTC', '/blog', 'whole row', '3:05']) assert.ok(row[1].includes(part), part);
+  assert.ok(!row[1].includes('<a '), 'no nested link');
+});
