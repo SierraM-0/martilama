@@ -270,7 +270,7 @@ test('the list page header is laid out like the site header: brand left, link to
   assert.ok(header, 'site-header');
   assert.match(header[1], /<h1 class="brand"><a href="\/">\s*<svg class="logo" width="44" height="44"/);
   assert.match(header[1], /<span class="name">martilama<\/span>\s*<span class="what">problem reports<\/span>/);
-  assert.match(header[1], /<nav>\s*<a href="https:\/\/martilama\.com\/">martilama\.com<\/a>\s*<\/nav>/);
+  assert.match(header[1], /<nav>\s*<a href="https:\/\/martilama\.com\/">martilama\.com<\/a>/);
 });
 
 test("the page background is the site's: same glow and film grain", async () => {
@@ -281,4 +281,17 @@ test("the page background is the site's: same glow and film grain", async () => 
   assert.ok(css.includes('background-attachment: fixed'), 'fixed');
   assert.match(css, /body::before \{[^}]*feTurbulence[^}]*\}/, 'grain');
   assert.match(css, /--grain: 0\.035;[\s\S]*--grain: 0\.05;/, 'grain strength, light then dark');
+});
+
+test('every page loads the theme script before the stylesheet, and has the toggle', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  for (const path of ['/', `/r/${id}`]) {
+    const html = await (await get(path, e)).text();
+    const script = html.indexOf('<script src="/theme.js"></script>');
+    const css = html.indexOf('<link rel="stylesheet" href="/viewer.css">');
+    assert.ok(script > 0 && script < css, `${path}: theme script first`);
+    assert.match(html, /<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch between light and dark"/, `${path}: toggle`);
+    assert.equal(html.split('id="theme-toggle"').length - 1, 1, `${path}: one toggle`);
+  }
 });

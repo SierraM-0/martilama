@@ -12,11 +12,18 @@
   --display: 'Fraunces Variable', Georgia, serif;
   --mono: 'JetBrains Mono Variable', ui-monospace, 'JetBrains Mono', monospace;
 }
+/* Dark: chosen with the toggle (theme.js sets data-theme)… */
+:root[data-theme="dark"] {
+  --bg: #14110e; --text: #e8e2d9; --muted: #9a9085; --border: #2a241e; --panel: #1d1813;
+  --raise: #241e18; --edge: #453b30; --grain: 0.05;
+  --accent: #e0915f; --warn: #d9a441; --error: #ef7d70;
+}
+/* …or, if that script never ran, taken from the system setting. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14110e; --text: #e8e2d9; --muted: #9a9085; --border: #2a241e; --panel: #1d1813;
-    --raise: #241e18; --edge: #453b30; --grain: 0.05;
-    --accent: #e0915f; --warn: #d9a441; --error: #ef7d70;
+  :root:not([data-theme]) {
+  --bg: #14110e; --text: #e8e2d9; --muted: #9a9085; --border: #2a241e; --panel: #1d1813;
+  --raise: #241e18; --edge: #453b30; --grain: 0.05;
+  --accent: #e0915f; --warn: #d9a441; --error: #ef7d70;
   }
 }
 * { box-sizing: border-box; }
@@ -66,6 +73,16 @@ main.list { max-width: 70rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
 .site-header .brand .what { font: italic 400 1.1rem var(--body); letter-spacing: 0; color: var(--muted); }
 .site-header .logo { display: block; flex: none; }
 .site-header nav { display: flex; align-items: center; gap: 1.4rem; }
+/* the site's sun and moon toggle */
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 0.42rem; cursor: pointer; line-height: 0; transition: border-color 0.25s ease, color 0.25s ease; }
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.toggle-icon { display: block; }
+.toggle-icon .sun, .toggle-icon .rays, .toggle-icon .moon-dot { transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease; }
+.toggle-icon .rays, .toggle-icon .sun { transform-origin: 12px 12px; }
+:root[data-theme="dark"] .toggle-icon .moon-dot { transform: translateX(-9px); }
+:root[data-theme="dark"] .toggle-icon .rays { opacity: 0; transform: scale(0.4) rotate(45deg); }
+:root[data-theme="dark"] .toggle-icon .sun { transform: scale(1.06); }
+.top .theme-toggle { margin-left: 0.25rem; }
 .site-header nav a { color: var(--text); font-size: 1.06rem; background-image: linear-gradient(var(--accent), var(--accent)); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.3s ease, color 0.25s ease; }
 .site-header nav a:hover { color: var(--accent); background-size: 100% 2px; text-decoration: none; }
 main.list > h1 { margin: 1.75rem 0 0.75rem; font: 600 1.6rem/1.2 var(--display); }
@@ -188,5 +205,5 @@ kbd + kbd { margin-left: 0.15rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   main.report { animation: none; }
-  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after, .site-header nav a { transition: none; }
+  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after, .site-header nav a, .theme-toggle, .toggle-icon * { transition: none; }
 }

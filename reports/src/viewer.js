@@ -65,6 +65,7 @@ async function listPage(env) {
     </a></h1>
     <nav>
       <a href="${esc(new URL('/', site).href)}">${esc(new URL(site).host)}</a>
+      ${THEME_TOGGLE}
     </nav>
   </header>
   ${metas.length ? table : '<p class="empty">No reports yet.</p>'}
@@ -80,6 +81,23 @@ const LOGO = `<svg class="logo" width="44" height="44" viewBox="0 0 64 64" aria-
   <path d="M35 34 H50" stroke="var(--bg)" stroke-width="7" stroke-linecap="round"/>
   <path d="M14 49 H50" stroke="var(--bg)" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
 </svg>`;
+
+// The same sun and moon toggle as martilama.com.
+const THEME_TOGGLE = `<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch between light and dark" title="Switch between light and dark">
+        <svg class="toggle-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <mask id="moon-mask">
+            <rect x="0" y="0" width="24" height="24" fill="white" />
+            <circle class="moon-dot" cx="24" cy="10" r="6" fill="black" />
+          </mask>
+          <circle class="sun" cx="12" cy="12" r="6" fill="currentColor" mask="url(#moon-mask)" />
+          <g class="rays" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <line x1="12" y1="1.5" x2="12" y2="3.5" /><line x1="12" y1="20.5" x2="12" y2="22.5" />
+            <line x1="1.5" y1="12" x2="3.5" y2="12" /><line x1="20.5" y1="12" x2="22.5" y2="12" />
+            <line x1="4.2" y1="4.2" x2="5.6" y2="5.6" /><line x1="18.4" y1="18.4" x2="19.8" y2="19.8" />
+            <line x1="4.2" y1="19.8" x2="5.6" y2="18.4" /><line x1="18.4" y1="5.6" x2="19.8" y2="4.2" />
+          </g>
+        </svg>
+      </button>`;
 
 const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation']];
 
@@ -103,6 +121,7 @@ async function reportPage(env, id) {
       ${step('newer', at > 0 ? ids[at - 1] : null, 'Newer')}
       ${step('older', at !== -1 ? ids[at + 1] : null, 'Older')}
       <button type="button" id="delete" class="btn danger">Delete report</button>
+      ${THEME_TOGGLE}
     </div>
     <details id="details" class="more">
       <summary class="btn">Details</summary>
