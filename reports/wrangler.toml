@@ -17,10 +17,10 @@ simple = { limit = 5, period = 60 }
 
 [vars]
 ALLOWED_ORIGINS = "https://martilama.com"
-# Fill both in after creating the Access application (README, "Reports").
-# While either is empty the viewer answers 403 to everyone.
-ACCESS_TEAM_DOMAIN = ""
-ACCESS_AUD = ""
+# The "Reports viewer" Access application's team domain and audience tag.
+# Neither is a secret. If either is empty the viewer answers 403 to everyone.
+ACCESS_TEAM_DOMAIN = "martilama.cloudflareaccess.com"
+ACCESS_AUD = "e0f635d26a84d8ebb6b89dce5d0074920eb2f22f28221a82209145ec254fcf3e"
 
 # Local `wrangler dev` only: without this the Worker sees requests as coming
 # to the route's hostname, and the localhost-only Access bypass never applies.
