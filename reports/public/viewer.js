@@ -1,10 +1,9 @@
 // Report page: loads the events, mounts rrweb-player, and keeps the console
-// panel and the marker strip in step with playback.
+// panel and the timeline markers in step with playback.
 (async function () {
   const root = document.getElementById('report');
   const log = document.getElementById('log');
   const mount = document.getElementById('player');
-  const marks = document.getElementById('marks');
   const filters = document.getElementById('filters');
   const id = root.dataset.id;
 
@@ -34,7 +33,6 @@
 
   const fail = (msg) => {
     mount.textContent = msg;
-    marks.hidden = true;
     filters.hidden = true;
   };
 
@@ -51,7 +49,7 @@
 
   // Fit the replay and its controls in the window without scrolling.
   const CONTROLLER = 80; // rrweb-player's control bar
-  const BELOW = 78; // marker strip + key hints + breathing room
+  const BELOW = 48; // key hints + breathing room
   const vw = Number(root.dataset.vw) || 1280;
   const vh = Number(root.dataset.vh) || 720;
   const width = mount.clientWidth;
@@ -64,16 +62,6 @@
     props: { events, width, height, autoPlay: false, skipInactive: false, showController: true },
   });
   const total = Math.max(1, events[events.length - 1].timestamp - events[0].timestamp);
-
-  // Line the marker strip up with the player's own progress bar, so a tick
-  // sits directly under the same moment on the bar above it.
-  const bar = mount.querySelector('.rr-progress');
-  if (bar) {
-    const outer = marks.parentElement.getBoundingClientRect();
-    const inner = bar.getBoundingClientRect();
-    marks.style.marginLeft = `${inner.left - outer.left}px`;
-    marks.style.width = `${inner.width}px`;
-  }
 
   const fmt = (ms) => {
     const s = Math.max(0, Math.floor(ms / 1000));
@@ -100,7 +88,11 @@
   none.className = 'entry none';
   log.append(none);
 
-  // marker strip: one tick per error, warning and navigation, plus a playhead
+  // markers: one tick per error, warning and navigation, drawn on the
+  // player's own progress bar
+  const marks = document.createElement('div');
+  marks.className = 'marks';
+  mount.querySelector('.rr-progress')?.append(marks);
   const ticks = entries.map((entry) => {
     if (entry.group === 'log') return null;
     const tick = document.createElement('button');
@@ -109,18 +101,11 @@
     tick.style.left = `${(entry.offset / total) * 100}%`;
     tick.title = `${fmt(entry.offset)}  ${entry.text}`;
     tick.addEventListener('click', (e) => {
-      e.stopPropagation();
+      e.stopPropagation(); // the bar's own click would seek to the pointer instead
       player.goto(entry.offset);
     });
     marks.append(tick);
     return tick;
-  });
-  const head = document.createElement('span');
-  head.className = 'head';
-  marks.append(head);
-  marks.addEventListener('click', (e) => {
-    const box = marks.getBoundingClientRect();
-    player.goto(Math.round(((e.clientX - box.left) / box.width) * total));
   });
 
   // filters
@@ -156,16 +141,19 @@
   let current = -1;
   function sync(time) {
     now = time;
-    head.style.left = `${Math.min(100, (time / total) * 100)}%`;
     let latest = -1;
     for (let i = 0; i < entries.length; i++) {
       if (entries[i].offset <= time && shown.has(entries[i].group)) latest = i;
     }
     if (latest === current) return;
-    if (current >= 0) items[current].classList.remove('current');
+    if (current >= 0) {
+      items[current].classList.remove('current');
+      ticks[current]?.classList.remove('on');
+    }
     current = latest;
     if (current >= 0) {
       items[current].classList.add('current');
+      ticks[current]?.classList.add('on');
       items[current].scrollIntoView({ block: 'nearest' });
     }
   }

@@ -17,7 +17,7 @@ function csp(siteOrigins) {
     "script-src 'self'",
     `style-src 'self' 'unsafe-inline' ${sites}`,
     `img-src 'self' data: blob: ${sites}`,
-    `font-src data: ${sites}`,
+    `font-src 'self' data: ${sites}`,
     `media-src ${sites}`,
     "connect-src 'self'",
     "frame-src 'self' about: blob:",

@@ -55,11 +55,22 @@ async function listPage(env) {
     </tbody>
   </table>`;
   const body = `<main class="list">
-  <h1>Problem reports</h1>
+  <header class="masthead">
+    ${LOGO}
+    <h1>martilama <span>problem reports</span></h1>
+  </header>
   ${metas.length ? table : '<p class="empty">No reports yet.</p>'}
 </main>`;
   return htmlPage({ title: 'Problem reports', body, siteOrigins: allowedOrigins(env) });
 }
+
+// The site's Mannaz mark, as on martilama.com.
+const LOGO = `<svg class="logo" width="40" height="40" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <rect x="3" y="3" width="58" height="58" rx="18" fill="var(--accent)" />
+      <g fill="none" stroke="var(--bg)" stroke-width="5" stroke-linecap="round">
+        <path d="M21 19 V45" /><path d="M43 19 V45" /><path d="M21 22 L43 34" /><path d="M43 22 L21 34" />
+      </g>
+    </svg>`;
 
 const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation']];
 
@@ -69,19 +80,19 @@ async function reportPage(env, id) {
   const ids = await listIds(env);
   const at = ids.indexOf(id);
   const step = (elId, target, label) => (target
-    ? `<a id="${elId}" href="/r/${esc(target)}">${label}</a>`
-    : `<span class="off">${label}</span>`);
+    ? `<a id="${elId}" href="/r/${esc(target)}" class="btn">${label}</a>`
+    : `<span class="btn off" aria-disabled="true">${label}</span>`);
   const position = at === -1 ? '' : `<span class="pos">${at + 1} of ${ids.length}</span>`;
   const filters = FILTERS.map(([key, label]) =>
-    `<button type="button" data-filter="${key}" aria-pressed="true">${label} <span class="n"></span></button>`).join('');
+    `<button type="button" class="btn" data-filter="${key}" aria-pressed="true">${label} <span class="n"></span></button>`).join('');
   const body = `<main class="report" id="report" data-id="${esc(m.id)}" data-vw="${esc(m.viewport.width)}" data-vh="${esc(m.viewport.height)}">
   <header class="top">
     <div class="bar">
-      <a class="back" href="/">All reports</a>
+      <a class="btn back" href="/">← All reports</a>
       ${position}
       ${step('newer', at > 0 ? ids[at - 1] : null, 'Newer')}
       ${step('older', at !== -1 ? ids[at + 1] : null, 'Older')}
-      <button type="button" id="delete">Delete report</button>
+      <button type="button" id="delete" class="btn danger">Delete report</button>
     </div>
     <p class="note">${esc(m.note) || '<em>No note</em>'}</p>
     <ul class="facts">
@@ -95,7 +106,6 @@ async function reportPage(env, id) {
   <div class="stage">
     <div class="main">
       <div id="player"></div>
-      <div id="marks" class="marks" title="Errors, warnings and page changes. Click to jump."></div>
       <p class="keys"><kbd>Space</kbd> play or pause <kbd>J</kbd> <kbd>K</kbd> next or previous entry <kbd>[</kbd> <kbd>]</kbd> newer or older report</p>
     </div>
     <aside class="side">

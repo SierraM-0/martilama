@@ -140,11 +140,31 @@ test('a lone report still renders, as 1 of 1', async () => {
   assert.ok(!html.includes('<a id="newer"') && !html.includes('<a id="older"'));
 });
 
-test('report page has the marker strip and the console filters', async () => {
+test('report page has the console filters', async () => {
   const e = env();
   const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
   const html = await (await get(`/r/${id}`, e)).text();
-  for (const s of ['id="marks"', 'id="filters"', 'data-filter="error"', 'data-filter="warning"', 'data-filter="log"', 'data-filter="nav"']) {
+  for (const s of ['id="filters"', 'data-filter="error"', 'data-filter="warning"', 'data-filter="log"', 'data-filter="nav"']) {
     assert.ok(html.includes(s), s);
   }
+});
+
+test('the list page carries the site logo and name', async () => {
+  const html = await (await get('/', env())).text();
+  assert.match(html, /<svg[^>]*class="logo"/);
+  assert.ok(html.includes('martilama'));
+});
+
+test('pages may load fonts from the viewer itself', async () => {
+  const csp = (await get('/', env())).headers.get('Content-Security-Policy');
+  assert.match(csp, /font-src 'self'/);
+});
+
+test('newer and older are marked up as buttons, with a disabled look at the ends', async () => {
+  const e = env();
+  const oldest = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const newest = await seed(e.REPORTS, { now: 1_700_000_900_000 });
+  const html = await (await get(`/r/${newest}`, e)).text();
+  assert.ok(html.includes(`<a id="older" href="/r/${oldest}" class="btn">`));
+  assert.ok(html.includes('<span class="btn off" aria-disabled="true">Newer</span>'));
 });
