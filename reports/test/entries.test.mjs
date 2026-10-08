@@ -183,23 +183,27 @@ test('shortcut: arrow keys step between entries, as J and K do', () => {
   assert.equal(shortcut(press('ArrowRight', { onControl: true })), 'next');
 });
 
-test('shortcut: Shift with Up or Down steps between reports, as [ and ] do', () => {
-  assert.equal(shortcut(press('ArrowUp', { shiftKey: true })), 'newer');
-  assert.equal(shortcut(press('ArrowDown', { shiftKey: true })), 'older');
+test('shortcut: Shift with Left or Right steps between reports, as [ and ] do', () => {
+  // Left is Newer and Right is Older, matching the order of the two buttons.
+  assert.equal(shortcut(press('ArrowLeft', { shiftKey: true })), 'newer');
+  assert.equal(shortcut(press('ArrowRight', { shiftKey: true })), 'older');
+  assert.equal(shortcut(press('ArrowLeft', { shiftKey: true, onControl: true })), 'newer');
 });
 
 test('shortcut: arrows that already mean something are left alone', () => {
-  // plain Up/Down scroll; Alt+Left is the browser's Back; Shift+Left/Right select text
+  // Up and Down scroll, with or without Shift; Alt+Left is the browser's Back
   assert.equal(shortcut(press('ArrowUp')), null);
   assert.equal(shortcut(press('ArrowDown')), null);
+  assert.equal(shortcut(press('ArrowUp', { shiftKey: true })), null);
+  assert.equal(shortcut(press('ArrowDown', { shiftKey: true })), null);
   assert.equal(shortcut(press('ArrowLeft', { altKey: true })), null);
   assert.equal(shortcut(press('ArrowRight', { ctrlKey: true })), null);
-  assert.equal(shortcut(press('ArrowRight', { shiftKey: true })), null);
-  assert.equal(shortcut(press('ArrowUp', { shiftKey: true, ctrlKey: true })), null);
-  // on the divider, Left and Right resize the split
+  assert.equal(shortcut(press('ArrowLeft', { shiftKey: true, ctrlKey: true })), null);
+  assert.equal(shortcut(press('ArrowRight', { shiftKey: true, altKey: true })), null);
+  // on the divider, plain Left and Right resize the split
   assert.equal(shortcut(press('ArrowLeft', { onSeparator: true })), null);
   assert.equal(shortcut(press('ArrowRight', { onSeparator: true })), null);
-  // and never while typing
+  // and never while typing, where Shift+arrows select text
   assert.equal(shortcut(press('ArrowRight', { typing: true })), null);
-  assert.equal(shortcut(press('ArrowDown', { shiftKey: true, typing: true })), null);
+  assert.equal(shortcut(press('ArrowLeft', { shiftKey: true, typing: true })), null);
 });

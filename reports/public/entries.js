@@ -65,14 +65,13 @@
     if (typing || metaKey) return null;
     // Arrow keys do the same jobs as the letter keys, for browsers where an
     // extension (Vim-style navigation, say) takes J, K and the brackets.
-    if (key === 'ArrowUp' || key === 'ArrowDown') {
-      if (!shiftKey || ctrlKey || altKey) return null; // plain Up/Down scroll
-      return key === 'ArrowUp' ? 'newer' : 'older';
-    }
     if (key === 'ArrowLeft' || key === 'ArrowRight') {
-      // On the divider these resize the split; with a modifier they belong
-      // to the browser (Alt+Left is Back) or to text selection.
-      if (shiftKey || ctrlKey || altKey || onSeparator) return null;
+      // With Ctrl or Alt they belong to the browser (Alt+Left is Back).
+      if (ctrlKey || altKey) return null;
+      // Shift: newer or older report, Left being Newer like the buttons.
+      if (shiftKey) return key === 'ArrowLeft' ? 'newer' : 'older';
+      // On the divider, plain Left and Right resize the split.
+      if (onSeparator) return null;
       return key === 'ArrowRight' ? 'next' : 'previous';
     }
     if (key === '[' || key === ']') {

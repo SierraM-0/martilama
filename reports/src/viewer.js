@@ -111,7 +111,7 @@ async function reportPage(env, id) {
     <div class="main">
       <div id="player" title="Click the replay to play or pause"></div>
       <p class="note" id="note">${esc(m.note) || '<em>The visitor left no note.</em>'}</p>
-      <p class="keys"><kbd>Space</kbd> play or pause <kbd>←</kbd> <kbd>→</kbd> previous or next entry <kbd>Shift</kbd> <kbd>↑</kbd> <kbd>↓</kbd> newer or older report <span class="alt">also K J and [ ]</span></p>
+      <p class="keys"><kbd>Space</kbd> play or pause <kbd>←</kbd> <kbd>→</kbd> previous or next entry <kbd>Shift</kbd> <kbd>←</kbd> <kbd>→</kbd> newer or older report <span class="alt">also K J and [ ]</span></p>
     </div>
     <div id="divider" class="divider" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Resize replay and console" title="Drag to resize. Double-click to reset."></div>
     <aside class="side">
