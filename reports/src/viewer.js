@@ -42,6 +42,7 @@ const pathOf = (url) => {
 
 async function listPage(env) {
   const metas = await listMetas(env);
+  const site = allowedOrigins(env)[0] ?? 'https://martilama.com';
   // Each row is a single link, so the whole row is clickable.
   const rows = metas.map((m) => `
     <li><a class="row" href="/r/${esc(m.id)}">
@@ -56,9 +57,15 @@ async function listPage(env) {
     </ol>
   </div>`;
   const body = `<main class="list">
-  <header class="masthead">
-    ${LOGO}
-    <h1>martilama <span>problem reports</span></h1>
+  <header class="site-header">
+    <h1 class="brand"><a href="/">
+      ${LOGO}
+      <span class="name">martilama</span>
+      <span class="what">problem reports</span>
+    </a></h1>
+    <nav>
+      <a href="${esc(new URL('/', site).href)}">${esc(new URL(site).host)}</a>
+    </nav>
   </header>
   ${metas.length ? table : '<p class="empty">No reports yet.</p>'}
 </main>`;
@@ -67,7 +74,7 @@ async function listPage(env) {
 
 // The service's mark: a console prompt over a log line. Same drawing as
 // public/favicon.svg, here in the page's own colours.
-const LOGO = `<svg class="logo" width="40" height="40" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+const LOGO = `<svg class="logo" width="44" height="44" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
   <rect x="3" y="3" width="58" height="58" rx="18" fill="var(--accent)"/>
   <path d="M14 14 L24.5 24 L14 34" fill="none" stroke="var(--bg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M35 34 H50" stroke="var(--bg)" stroke-width="7" stroke-linecap="round"/>

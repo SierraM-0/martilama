@@ -263,3 +263,22 @@ test("the report page's note styling does not leak into the list's note column",
   assert.ok(!/^\.note\b/m.test(css), 'no bare .note rule');
   assert.match(css, /^#note::before \{ content: "Visitor's note"/m);
 });
+
+test('the list page header is laid out like the site header: brand left, link to the site right', async () => {
+  const html = await (await get('/', env())).text();
+  const header = html.match(/<header class="site-header">([\s\S]*?)<\/header>/);
+  assert.ok(header, 'site-header');
+  assert.match(header[1], /<h1 class="brand"><a href="\/">\s*<svg class="logo" width="44" height="44"/);
+  assert.match(header[1], /<span class="name">martilama<\/span>\s*<span class="what">problem reports<\/span>/);
+  assert.match(header[1], /<nav>\s*<a href="https:\/\/martilama\.com\/">martilama\.com<\/a>\s*<\/nav>/);
+});
+
+test("the page background is the site's: same glow and film grain", async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('../public/viewer.css', import.meta.url), 'utf8');
+  assert.ok(css.includes('radial-gradient(120% 65% at 50% -15%'), 'glow geometry');
+  assert.ok(css.includes('color-mix(in oklab, var(--accent) 13%, transparent), transparent 55%)'), 'glow strength');
+  assert.ok(css.includes('background-attachment: fixed'), 'fixed');
+  assert.match(css, /body::before \{[^}]*feTurbulence[^}]*\}/, 'grain');
+  assert.match(css, /--grain: 0\.035;[\s\S]*--grain: 0\.05;/, 'grain strength, light then dark');
+});

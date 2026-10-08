@@ -6,7 +6,7 @@
 
 :root {
   --bg: #faf8f5; --text: #2b2722; --muted: #6b6358; --border: #e7e0d6; --panel: #f1ece4;
-  --raise: #fffdfa; --edge: #cdc2b2;
+  --raise: #fffdfa; --edge: #cdc2b2; --grain: 0.035;
   --accent: #b85c38; --warn: #8a5a00; --error: #a3271d;
   --body: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
   --display: 'Fraunces Variable', Georgia, serif;
@@ -15,19 +15,24 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #14110e; --text: #e8e2d9; --muted: #9a9085; --border: #2a241e; --panel: #1d1813;
-    --raise: #241e18; --edge: #453b30;
+    --raise: #241e18; --edge: #453b30; --grain: 0.05;
     --accent: #e0915f; --warn: #d9a441; --error: #ef7d70;
   }
 }
 * { box-sizing: border-box; }
 html { font-optical-sizing: auto; }
+/* The page background is martilama.com's, rule for rule: the base colour,
+   the warm glow from the top, and the fine film grain over it. */
 body {
   margin: 0; color: var(--text); font: 17px/1.5 var(--body);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
   background-color: var(--bg);
-  /* the same soft wash the site has at the top of every page */
-  background-image: radial-gradient(ellipse 80% 340px at 50% 0, color-mix(in oklab, var(--accent) 11%, transparent), transparent 62%);
+  background-image: radial-gradient(120% 65% at 50% -15%,
+    color-mix(in oklab, var(--accent) 13%, transparent), transparent 55%);
+  background-attachment: fixed;
   background-repeat: no-repeat;
 }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: var(--grain); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button { font: inherit; }
@@ -52,16 +57,22 @@ em { color: var(--muted); }
 .btn.danger:hover { border-color: var(--error); }
 
 /* list */
-main.list { max-width: 70rem; margin: 0 auto; padding: 1.75rem 1rem 4rem; }
-.masthead { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.25rem; }
-.masthead .logo { flex: none; }
-.masthead h1 { margin: 0; font: 600 1.6rem/1.2 var(--display); letter-spacing: -0.01em; }
-.masthead h1 span { font: italic 400 1.15rem var(--body); color: var(--muted); margin-left: 0.3rem; }
-main.list > h1 { margin: 0 0 0.75rem; font: 600 1.6rem/1.2 var(--display); }
+main.list { max-width: 70rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+/* header, shaped like martilama.com's: brand on the left, links on the right */
+.site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.75rem 0 0.85rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+.site-header .brand { margin: 0; font: 600 1.55rem/1.2 var(--display); letter-spacing: -0.015em; }
+.site-header .brand a { display: inline-flex; align-items: center; gap: 0.7rem; color: var(--text); }
+.site-header .brand a:hover { color: var(--accent); text-decoration: none; }
+.site-header .brand .what { font: italic 400 1.1rem var(--body); letter-spacing: 0; color: var(--muted); }
+.site-header .logo { display: block; flex: none; }
+.site-header nav { display: flex; align-items: center; gap: 1.4rem; }
+.site-header nav a { color: var(--text); font-size: 1.06rem; background-image: linear-gradient(var(--accent), var(--accent)); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.3s ease, color 0.25s ease; }
+.site-header nav a:hover { color: var(--accent); background-size: 100% 2px; text-decoration: none; }
+main.list > h1 { margin: 1.75rem 0 0.75rem; font: 600 1.6rem/1.2 var(--display); }
 .empty { color: var(--muted); }
 .reports ol { list-style: none; margin: 0; padding: 0; }
 .reports .row { display: grid; grid-template-columns: 13.5rem 11rem minmax(0, 1fr) 4rem; gap: 0 1.25rem; align-items: baseline; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); }
-.reports .head { font-style: italic; font-size: 0.95rem; color: var(--muted); padding-top: 0.4rem; padding-bottom: 0.4rem; }
+.reports .head { font-style: italic; font-size: 0.95rem; color: var(--muted); padding-top: 0; padding-bottom: 0.4rem; }
 .reports a.row { color: var(--text); text-decoration: none; transition: background-color 0.15s; }
 .reports a.row:hover { background: var(--panel); text-decoration: none; }
 .reports a.row:hover .when { text-decoration: underline; }
@@ -177,5 +188,5 @@ kbd + kbd { margin-left: 0.15rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   main.report { animation: none; }
-  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after { transition: none; }
+  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after, .site-header nav a { transition: none; }
 }
