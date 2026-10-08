@@ -21,3 +21,9 @@ ALLOWED_ORIGINS = "https://martilama.com"
 # While either is empty the viewer answers 403 to everyone.
 ACCESS_TEAM_DOMAIN = ""
 ACCESS_AUD = ""
+
+# Local `wrangler dev` only: without this the Worker sees requests as coming
+# to the route's hostname, and the localhost-only Access bypass never applies.
+[dev]
+host = "localhost:8787"
+upstream_protocol = "http"

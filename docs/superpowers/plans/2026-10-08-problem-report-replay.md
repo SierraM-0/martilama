@@ -450,7 +450,7 @@ Append to `styles/global.css`:
 
 - [ ] **Step 9: Run tests and build**
 
-Run: `node --test test/ && npm run build && ls dist/_headers dist/js/vendor/`
+Run: `node --test "test/*.test.mjs" && npm run build && ls dist/_headers dist/js/vendor/`
 Expected: all tests pass; build prints `Built … pages`; both vendor files and `_headers` are in `dist/`.
 
 - [ ] **Step 10: Commit**
@@ -659,7 +659,7 @@ Expected:
 
 - [ ] **Step 3: Run the test suite**
 
-Run: `node --test test/`
+Run: `node --test "test/*.test.mjs"`
 Expected: all pass.
 
 - [ ] **Step 4: Commit**
@@ -1606,7 +1606,7 @@ export default {
 
 - [ ] **Step 6: Run to verify pass**
 
-Run: `node --test reports/test/`
+Run: `node --test "reports/test/*.test.mjs"`
 Expected: all ingest, access and viewer tests pass (27 total).
 
 - [ ] **Step 7: Commit**
@@ -1939,7 +1939,7 @@ h1 { margin: 0 0 1rem; font-size: 1.5rem; }
 
 - [ ] **Step 8: Run the Worker tests**
 
-Run: `node --test reports/test/`
+Run: `node --test "reports/test/*.test.mjs"`
 Expected: all pass (33 total).
 
 - [ ] **Step 9: Commit**
@@ -1977,7 +1977,7 @@ Terminal 2: `npm run build && npm run preview` (serves `http://localhost:4321`).
 4. Open `http://localhost:8787/`. Expect one report with the note, the page path and a length between 3:00 and 3:30.
 5. Open it and press play. Expect: the replay shows the browsing, the cursor moves smoothly, the last thing that happens is the cursor arriving on the footer link, and the dialog never appears.
 6. Expect the side panel to list the three console lines (warn and error coloured), the navigations, and a final `Clicked "report a problem"` entry; clicking an entry seeks the replay.
-7. Check the viewer's devtools console for Content-Security-Policy violations. If rrweb-player is blocked from something it needs, widen only the matching directive in `csp()` in `reports/src/html.js`, re-run `node --test reports/test/`, and note the change in the commit.
+7. Check the viewer's devtools console for Content-Security-Policy violations. If rrweb-player is blocked from something it needs, widen only the matching directive in `csp()` in `reports/src/html.js`, re-run `node --test "reports/test/*.test.mjs"`, and note the change in the commit.
 
 Fonts in local replays fall back to system fonts (the preview server sends no CORS header); that is expected locally and fixed in production by `public/_headers`.
 
