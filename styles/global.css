@@ -699,3 +699,36 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 @view-transition {
   navigation: auto;
 }
+
+/* ---- problem report ---- */
+.report-link {
+  font: inherit; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer;
+}
+.report-link:hover { color: var(--accent); }
+#report-slot[hidden] { display: none; }
+.report-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.5rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: left;
+}
+.report-dialog::backdrop { background: rgb(0 0 0 / 0.45); }
+.report-dialog h2 { margin: 0 0 0.5rem; font-size: 1.2rem; }
+.report-dialog p { margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem; }
+.report-dialog label { display: block; margin-bottom: 0.35rem; font-size: 0.9rem; }
+.report-dialog textarea {
+  width: 100%; box-sizing: border-box; padding: 0.6rem; font: inherit;
+  color: var(--text); background: transparent;
+  border: 1px solid var(--border); border-radius: 6px; resize: vertical;
+}
+.report-dialog .report-status { min-height: 1.4em; margin: 0.75rem 0 0; }
+.report-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1rem; }
+.report-actions button {
+  font: inherit; padding: 0.45rem 1rem; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--border); background: transparent; color: var(--text);
+}
+.report-actions .primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.report-actions button:disabled { opacity: 0.6; cursor: default; }

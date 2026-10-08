@@ -45,6 +45,10 @@ export function BaseLayout({ title, description, ogType = 'website', ogImage, ur
       <main>${raw(body)}</main>
       ${raw(Footer())}
     </div>
+    <script src="/js/vendor/rrweb-record.min.js${v}"></script>
+    <script src="/js/vendor/rrweb-console-record.min.js${v}"></script>
+    <script src="/js/report-buffer.js${v}"></script>
+    <script src="/js/report.js${v}"></script>
     <script src="/js/theme.js${v}"></script>
     <script src="/js/progress.js${v}"></script>
     <script src="/js/clock.js${v}"></script>

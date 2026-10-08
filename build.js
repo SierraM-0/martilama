@@ -36,7 +36,8 @@ async function main() {
   // appends it to the /global.css and /js/* URLs as ?v=…, so a deploy that
   // changes either one yields a new URL and every browser refetches. Without
   // this, new HTML can pair with a stale, unversioned cached stylesheet.
-  const jsNames = ['theme', 'progress', 'clock', 'router'];
+  const jsNames = ['theme', 'progress', 'clock', 'router', 'report-buffer', 'report',
+    'vendor/rrweb-record.min', 'vendor/rrweb-console-record.min'];
   const assetBufs = await Promise.all([
     fs.readFile('styles/global.css'),
     ...jsNames.map((n) => fs.readFile(`public/js/${n}.js`)),
