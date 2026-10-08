@@ -87,3 +87,92 @@ test('counts totals the entries per filter, including empty filters', () => {
   assert.deepEqual(counts(out), { error: 2, warning: 0, log: 0, nav: 1 });
   assert.deepEqual(counts([]), { error: 0, warning: 0, log: 0, nav: 0 });
 });
+
+const { shortcut, stepIndex } = globalThis.ReportEntries;
+const press = (key, mods = {}) => ({ key, ctrlKey: false, altKey: false, metaKey: false, onControl: false, typing: false, ...mods });
+
+test('shortcut: plain keys map to their actions', () => {
+  assert.equal(shortcut(press('[')), 'newer');
+  assert.equal(shortcut(press(']')), 'older');
+  assert.equal(shortcut(press('j')), 'next');
+  assert.equal(shortcut(press('K')), 'previous');
+  assert.equal(shortcut(press(' ')), 'toggle');
+  assert.equal(shortcut(press('x')), null);
+});
+
+test('shortcut: brackets typed with AltGr or Option still work', () => {
+  // Windows reports AltGr as Ctrl+Alt; macOS Option is Alt alone.
+  assert.equal(shortcut(press('[', { ctrlKey: true, altKey: true })), 'newer');
+  assert.equal(shortcut(press(']', { ctrlKey: true, altKey: true })), 'older');
+  assert.equal(shortcut(press('[', { altKey: true })), 'newer');
+});
+
+test('shortcut: browser and system combinations are left alone', () => {
+  assert.equal(shortcut(press('[', { ctrlKey: true })), null);
+  assert.equal(shortcut(press(']', { metaKey: true })), null);
+  assert.equal(shortcut(press('j', { ctrlKey: true })), null);
+  assert.equal(shortcut(press('k', { altKey: true })), null);
+  assert.equal(shortcut(press(' ', { metaKey: true })), null);
+});
+
+test('shortcut: Space is left to a focused control, and nothing fires while typing', () => {
+  assert.equal(shortcut(press(' ', { onControl: true })), null);
+  assert.equal(shortcut(press('j', { onControl: true })), 'next');
+  assert.equal(shortcut(press('[', { onControl: true })), 'newer');
+  for (const key of [' ', 'j', 'k', '[', ']']) assert.equal(shortcut(press(key, { typing: true })), null, key);
+});
+
+test('stepIndex: next goes to the following visible entry, however close in time', () => {
+  // visible entry indices; entries 2 and 3 are 5 ms apart in the recording
+  const visible = [0, 2, 3, 6];
+  assert.equal(stepIndex(visible, -1, 1, 0), 0);
+  assert.equal(stepIndex(visible, 2, 1, 0), 3);
+  assert.equal(stepIndex(visible, 3, 1, 0), 6);
+  assert.equal(stepIndex(visible, 6, 1, 0), -1);
+});
+
+test('stepIndex: previous restarts the current entry when well past it, else steps back', () => {
+  const visible = [0, 2, 3, 6];
+  assert.equal(stepIndex(visible, 3, -1, 200), 2);
+  assert.equal(stepIndex(visible, 3, -1, 4000), 3);
+  assert.equal(stepIndex(visible, 0, -1, 200), -1);
+  assert.equal(stepIndex(visible, 0, -1, 4000), 0);
+  assert.equal(stepIndex(visible, -1, -1, 0), -1);
+});
+
+test('stepIndex: works when the current entry is hidden by a filter', () => {
+  // current is index 4, which is filtered out
+  assert.equal(stepIndex([0, 2, 6], 4, 1, 0), 6);
+  assert.equal(stepIndex([0, 2, 6], 4, -1, 0), 2);
+  assert.equal(stepIndex([], 4, 1, 0), -1);
+});
+
+const { currentIndex } = globalThis.ReportEntries;
+
+test('currentIndex: the latest visible entry at or before the playback time', () => {
+  const offsets = [0, 1000, 5000, 5004, 9000];
+  const all = [true, true, true, true, true];
+  assert.equal(currentIndex(offsets, all, -1, -1), -1);
+  assert.equal(currentIndex(offsets, all, 1200, -1), 1);
+  assert.equal(currentIndex(offsets, all, 5010, -1), 3);
+  assert.equal(currentIndex(offsets, [true, false, true, true, true], 1200, -1), 0);
+});
+
+test('currentIndex: an entry just jumped to stays current over ones logged at the same moment', () => {
+  const offsets = [0, 5000, 5000, 5004, 9000];
+  const all = [true, true, true, true, true];
+  // jumped to entry 1; entries 2 and 3 share (nearly) its time
+  assert.equal(currentIndex(offsets, all, 5000, 1), 1);
+  assert.equal(currentIndex(offsets, all, 5004, 1), 1);
+  assert.equal(currentIndex(offsets, all, 5000, 2), 2);
+  // once playback moves on, the pin no longer applies
+  assert.equal(currentIndex(offsets, all, 5400, 1), 3);
+  assert.equal(currentIndex(offsets, all, 9000, 1), 4);
+  // seeking back before the pinned entry drops it too
+  assert.equal(currentIndex(offsets, all, 900, 1), 0);
+});
+
+test('currentIndex: a pinned entry hidden by a filter is ignored', () => {
+  const offsets = [0, 5000, 5000];
+  assert.equal(currentIndex(offsets, [true, false, true], 5000, 1), 2);
+});

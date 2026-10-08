@@ -17,15 +17,19 @@
   // Stepping between reports works even when this recording fails to load.
   let player = null;
   let step = () => {};
+  let jump = () => {};
   document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.target.closest('input, textarea, select')) return;
-    const go = (linkId) => document.getElementById(linkId)?.click();
-    if (e.key === '[') go('newer');
-    else if (e.key === ']') go('older');
-    else if (e.key === 'j' || e.key === 'J') step(1);
-    else if (e.key === 'k' || e.key === 'K') step(-1);
-    else if (e.key === ' ' && player && !e.target.closest('button, a')) {
+    const el = e.target instanceof Element ? e.target : null;
+    const action = window.ReportEntries.shortcut({
+      key: e.key, ctrlKey: e.ctrlKey, altKey: e.altKey, metaKey: e.metaKey,
+      typing: !!el?.closest('input, textarea, select, [contenteditable]'),
+      onControl: !!el?.closest('button, a, summary, [tabindex]'),
+    });
+    if (!action) return;
+    if (action === 'newer' || action === 'older') document.getElementById(action)?.click();
+    else if (action === 'next') step(1);
+    else if (action === 'previous') step(-1);
+    else if (player) {
       e.preventDefault(); // keep Space from scrolling the page
       player.toggle();
     }
@@ -99,7 +103,13 @@
       player.triggerResize();
     });
   };
-  window.addEventListener('resize', refit);
+  window.addEventListener('resize', () => {
+    // A split saved on a wide window may not fit a narrower one.
+    if (stage.style.getPropertyValue('--side')) setSide(parseFloat(stage.style.getPropertyValue('--side')));
+    refit();
+  });
+  // The note and key hints change height when the web fonts swap in.
+  document.fonts?.ready.then(refit);
   document.addEventListener('fullscreenchange', () => setTimeout(refit, 50));
   document.getElementById('details').addEventListener('toggle', refit);
 
@@ -107,30 +117,35 @@
   mount.querySelector('.rr-player__frame')?.addEventListener('click', () => player.toggle());
 
   const sideWidth = () => document.querySelector('.side').getBoundingClientRect().width;
-  const commit = (px) => {
+  const resize = (px) => {
     const applied = setSide(px);
     refit();
-    try { localStorage.setItem(SIDE_KEY, String(applied)); } catch { /* storage blocked */ }
+    return applied;
+  };
+  const persist = (px) => {
+    try { localStorage.setItem(SIDE_KEY, String(px)); } catch { /* storage blocked */ }
   };
   divider.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     divider.setPointerCapture(e.pointerId);
     stage.classList.add('dragging'); // lets the pointer pass over the replay iframe
     const right = stage.getBoundingClientRect().right;
-    const move = (ev) => commit(right - ev.clientX - divider.offsetWidth / 2);
+    let applied = null;
+    const move = (ev) => { applied = resize(right - ev.clientX - divider.offsetWidth / 2); };
     const stop = () => {
       stage.classList.remove('dragging');
       divider.removeEventListener('pointermove', move);
       divider.removeEventListener('pointerup', stop);
       divider.removeEventListener('pointercancel', stop);
+      if (applied !== null) persist(applied); // once, not on every movement
     };
     divider.addEventListener('pointermove', move);
     divider.addEventListener('pointerup', stop);
     divider.addEventListener('pointercancel', stop);
   });
   divider.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') commit(sideWidth() + 32);
-    else if (e.key === 'ArrowRight') commit(sideWidth() - 32);
+    if (e.key === 'ArrowLeft') persist(resize(sideWidth() + 32));
+    else if (e.key === 'ArrowRight') persist(resize(sideWidth() - 32));
     else return;
     e.preventDefault();
   });
@@ -157,7 +172,7 @@
     const text = document.createElement('span');
     text.textContent = entry.text;
     li.append(time, text);
-    li.addEventListener('click', () => player.goto(entry.offset));
+    li.addEventListener('click', () => jump(entries.indexOf(entry)));
     log.append(li);
     return li;
   });
@@ -179,7 +194,7 @@
     tick.title = `${fmt(entry.offset)}  ${entry.text}`;
     tick.addEventListener('click', (e) => {
       e.stopPropagation(); // the bar's own click would seek to the pointer instead
-      player.goto(entry.offset);
+      jump(entries.indexOf(entry));
     });
     marks.append(tick);
     return tick;
@@ -216,12 +231,14 @@
   // follow playback: highlight the latest visible entry at or before now
   let now = 0;
   let current = -1;
+  let pinned = -1; // the entry last jumped to; see ReportEntries.currentIndex
+  const offsets = entries.map((entry) => entry.offset);
   function sync(time) {
     now = time;
-    let latest = -1;
-    for (let i = 0; i < entries.length; i++) {
-      if (entries[i].offset <= time && shown.has(entries[i].group)) latest = i;
-    }
+    const latest = window.ReportEntries.currentIndex(
+      offsets, entries.map((entry) => shown.has(entry.group)), time, pinned,
+    );
+    if (latest !== pinned) pinned = -1;
     if (latest === current) return;
     if (current >= 0) {
       items[current].classList.remove('current');
@@ -231,18 +248,27 @@
     if (current >= 0) {
       items[current].classList.add('current');
       ticks[current]?.classList.add('on');
-      items[current].scrollIntoView({ block: 'nearest' });
+      // Scroll the console list only; scrollIntoView would move the page too.
+      const box = log.getBoundingClientRect();
+      const row = items[current].getBoundingClientRect();
+      if (row.top < box.top) log.scrollTop -= box.top - row.top;
+      else if (row.bottom > box.bottom) log.scrollTop += row.bottom - box.bottom;
     }
   }
   player.addEventListener('ui-update-current-time', (e) => sync(e.payload));
+  // Go to an entry and show it as current, even if others share its moment.
+  jump = (i) => {
+    pinned = i;
+    player.goto(entries[i].offset);
+    sync(entries[i].offset);
+  };
   sync(0);
 
-  // J / K: jump to the next or previous visible entry
+  // J / K: jump to the next or previous visible entry, by position
   step = (dir) => {
-    const visible = entries.filter((entry) => shown.has(entry.group));
-    const target = dir > 0
-      ? visible.find((entry) => entry.offset > now + 50)
-      : visible.filter((entry) => entry.offset < now - 50).pop();
-    if (target) player.goto(target.offset);
+    const visible = entries.map((entry, i) => (shown.has(entry.group) ? i : -1)).filter((i) => i >= 0);
+    const since = current >= 0 ? now - entries[current].offset : 0;
+    const target = window.ReportEntries.stepIndex(visible, current, dir, since);
+    if (target >= 0) jump(target);
   };
 })();

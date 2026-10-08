@@ -58,5 +58,52 @@
     return out;
   }
 
-  g.ReportEntries = { build, group, counts };
+  // Which viewer action a key press means, or null. Pure so it can be tested:
+  // the caller says whether focus is in a text field (typing) or on a control
+  // that uses Space itself (onControl).
+  function shortcut({ key, ctrlKey, altKey, metaKey, onControl, typing }) {
+    if (typing || metaKey) return null;
+    if (key === '[' || key === ']') {
+      // On many layouts brackets need AltGr (reported as Ctrl+Alt) or Option
+      // (Alt). Only a bare Ctrl is someone else's shortcut.
+      if (ctrlKey && !altKey) return null;
+      return key === '[' ? 'newer' : 'older';
+    }
+    if (ctrlKey || altKey) return null;
+    if (key === 'j' || key === 'J') return 'next';
+    if (key === 'k' || key === 'K') return 'previous';
+    if (key === ' ' && !onControl) return 'toggle';
+    return null;
+  }
+
+  // Which entry J or K should jump to, by position rather than by time, so
+  // entries logged a few milliseconds apart are each reachable. `visible` is
+  // the sorted indices passing the filters; `current` the entry playback is on
+  // (-1 before the first). Stepping back from well inside an entry restarts it.
+  function stepIndex(visible, current, dir, sinceCurrentMs) {
+    if (dir > 0) {
+      const next = visible.find((i) => i > current);
+      return next === undefined ? -1 : next;
+    }
+    if (current >= 0 && sinceCurrentMs > 1000 && visible.includes(current)) return current;
+    const before = visible.filter((i) => i < current);
+    return before.length ? before[before.length - 1] : -1;
+  }
+
+  // Which entry to highlight at a playback time: the latest visible one at or
+  // before it. `pinned` is the entry the viewer last jumped to; it wins over
+  // entries logged at (almost) the same moment, so each can be shown in turn.
+  const SAME_MOMENT_MS = 100;
+  function currentIndex(offsets, visible, time, pinned) {
+    if (pinned >= 0 && visible[pinned] && time >= offsets[pinned] && time - offsets[pinned] < SAME_MOMENT_MS) {
+      return pinned;
+    }
+    let latest = -1;
+    for (let i = 0; i < offsets.length; i++) {
+      if (offsets[i] <= time && visible[i]) latest = i;
+    }
+    return latest;
+  }
+
+  g.ReportEntries = { build, group, counts, shortcut, stepIndex, currentIndex };
 })(globalThis);
