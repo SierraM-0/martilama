@@ -63,3 +63,27 @@ test('a console argument that is not valid JSON is shown as is', () => {
   ev.data.payload.payload = ['[object Object]', '"quoted"'];
   assert.equal(build([...base, ev])[0].text, '[object Object] quoted');
 });
+
+const { group, counts } = globalThis.ReportEntries;
+
+test('group sorts every entry into one of the four console filters', () => {
+  const out = build([
+    ...base,
+    consoleEv(T0 + 1, 'error', ['a']),
+    consoleEv(T0 + 2, 'warn', ['b']),
+    consoleEv(T0 + 3, 'log', ['c']),
+    consoleEv(T0 + 4, 'info', ['d']),
+    consoleEv(T0 + 5, 'debug', ['e']),
+    customEv(T0 + 6, 'navigate', { path: '/x' }),
+    customEv(T0 + 7, 'tab-hidden'),
+    customEv(T0 + 8, 'report-click'),
+    customEv(T0 + 9, 'early-console', { level: 'error', time: T0 + 9, args: ['f'] }),
+  ]);
+  assert.deepEqual(out.map(group), ['error', 'warning', 'log', 'log', 'log', 'nav', 'nav', 'nav', 'error']);
+});
+
+test('counts totals the entries per filter, including empty filters', () => {
+  const out = build([...base, consoleEv(T0 + 1, 'error', ['a']), consoleEv(T0 + 2, 'error', ['b']), customEv(T0 + 3, 'navigate', { path: '/x' })]);
+  assert.deepEqual(counts(out), { error: 2, warning: 0, log: 0, nav: 1 });
+  assert.deepEqual(counts([]), { error: 0, warning: 0, log: 0, nav: 0 });
+});

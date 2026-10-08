@@ -109,3 +109,42 @@ test('entry point: /ingest is public, everything else needs Access', async () =>
   const ingest = await worker.fetch(new Request(`${BASE}/ingest`, { method: 'GET', headers: { Origin: 'https://martilama.com' } }), e);
   assert.equal(ingest.status, 405);
 });
+
+test('report page links to the newer and older report and shows its position', async () => {
+  const e = env();
+  const oldest = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const middle = await seed(e.REPORTS, { now: 1_700_000_500_000 });
+  const newest = await seed(e.REPORTS, { now: 1_700_000_900_000 });
+  const html = await (await get(`/r/${middle}`, e)).text();
+  assert.ok(html.includes(`<a id="newer" href="/r/${newest}"`), 'newer link');
+  assert.ok(html.includes(`<a id="older" href="/r/${oldest}"`), 'older link');
+  assert.ok(html.includes('2 of 3'));
+});
+
+test('the newest and oldest reports have no link past the end', async () => {
+  const e = env();
+  const oldest = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const newest = await seed(e.REPORTS, { now: 1_700_000_900_000 });
+  const first = await (await get(`/r/${newest}`, e)).text();
+  assert.ok(!first.includes('<a id="newer"') && first.includes(`<a id="older" href="/r/${oldest}"`));
+  assert.ok(first.includes('1 of 2'));
+  const last = await (await get(`/r/${oldest}`, e)).text();
+  assert.ok(last.includes(`<a id="newer" href="/r/${newest}"`) && !last.includes('<a id="older"'));
+});
+
+test('a lone report still renders, as 1 of 1', async () => {
+  const e = env();
+  const only = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const html = await (await get(`/r/${only}`, e)).text();
+  assert.ok(html.includes('1 of 1'));
+  assert.ok(!html.includes('<a id="newer"') && !html.includes('<a id="older"'));
+});
+
+test('report page has the marker strip and the console filters', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const html = await (await get(`/r/${id}`, e)).text();
+  for (const s of ['id="marks"', 'id="filters"', 'data-filter="error"', 'data-filter="warning"', 'data-filter="log"', 'data-filter="nav"']) {
+    assert.ok(html.includes(s), s);
+  }
+});

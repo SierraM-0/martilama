@@ -44,5 +44,19 @@
     return out.sort((a, b) => a.offset - b.offset);
   }
 
-  g.ReportEntries = { build };
+  // The four console filters. Tab and report-click markers count as navigation.
+  function group(entry) {
+    if (entry.kind !== 'console') return 'nav';
+    if (entry.level === 'error') return 'error';
+    if (entry.level === 'warn') return 'warning';
+    return 'log';
+  }
+
+  function counts(entries) {
+    const out = { error: 0, warning: 0, log: 0, nav: 0 };
+    for (const e of entries) out[group(e)] += 1;
+    return out;
+  }
+
+  g.ReportEntries = { build, group, counts };
 })(globalThis);

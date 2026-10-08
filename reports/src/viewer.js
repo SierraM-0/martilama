@@ -19,13 +19,16 @@ async function readMeta(env, id) {
   }
 }
 
-async function listMetas(env) {
-  // Two objects per report, so ask for twice the page size.
-  const { objects } = await env.REPORTS.list({ prefix: 'reports/', limit: LIST_LIMIT * 2 });
-  const ids = objects
+// Every report id, newest first (ids are inverted timestamps).
+async function listIds(env) {
+  const { objects } = await env.REPORTS.list({ prefix: 'reports/', limit: 1000 });
+  return objects
     .map((o) => o.key.match(/^reports\/([^/]+)\/meta\.json$/)?.[1])
-    .filter((id) => id && ID.test(id))
-    .slice(0, LIST_LIMIT);
+    .filter((id) => id && ID.test(id));
+}
+
+async function listMetas(env) {
+  const ids = (await listIds(env)).slice(0, LIST_LIMIT);
   return (await Promise.all(ids.map((id) => readMeta(env, id)))).filter(Boolean);
 }
 
@@ -40,41 +43,69 @@ const pathOf = (url) => {
 async function listPage(env) {
   const metas = await listMetas(env);
   const rows = metas.map((m) => `
-    <li><a href="/r/${esc(m.id)}">
-      <time>${esc(fmtDate(m.receivedAt))}</time>
-      <span class="page">${esc(pathOf(m.url))}</span>
-      <span class="dur">${esc(fmtDuration(m.endedAt - m.startedAt))}</span>
-      <span class="note">${esc(m.note) || '<em>no note</em>'}</span>
-    </a></li>`).join('');
+      <tr>
+        <td class="when"><a href="/r/${esc(m.id)}">${esc(fmtDate(m.receivedAt))}</a></td>
+        <td class="page">${esc(pathOf(m.url))}</td>
+        <td class="note">${esc(m.note) || '<em>No note</em>'}</td>
+        <td class="dur">${esc(fmtDuration(m.endedAt - m.startedAt))}</td>
+      </tr>`).join('');
+  const table = `<table class="reports">
+    <thead><tr><th>Received</th><th>Page</th><th>Note</th><th class="dur">Length</th></tr></thead>
+    <tbody>${rows}
+    </tbody>
+  </table>`;
   const body = `<main class="list">
   <h1>Problem reports</h1>
-  ${metas.length ? `<ul class="reports">${rows}</ul>` : '<p class="empty">No reports yet.</p>'}
+  ${metas.length ? table : '<p class="empty">No reports yet.</p>'}
 </main>`;
   return htmlPage({ title: 'Problem reports', body, siteOrigins: allowedOrigins(env) });
 }
 
+const FILTERS = [['error', 'Errors'], ['warning', 'Warnings'], ['log', 'Logs'], ['nav', 'Navigation']];
+
 async function reportPage(env, id) {
   const m = await readMeta(env, id);
   if (!m) return notFound(env);
+  const ids = await listIds(env);
+  const at = ids.indexOf(id);
+  const step = (elId, target, label) => (target
+    ? `<a id="${elId}" href="/r/${esc(target)}">${label}</a>`
+    : `<span class="off">${label}</span>`);
+  const position = at === -1 ? '' : `<span class="pos">${at + 1} of ${ids.length}</span>`;
+  const filters = FILTERS.map(([key, label]) =>
+    `<button type="button" data-filter="${key}" aria-pressed="true">${label} <span class="n"></span></button>`).join('');
   const body = `<main class="report" id="report" data-id="${esc(m.id)}" data-vw="${esc(m.viewport.width)}" data-vh="${esc(m.viewport.height)}">
-  <header>
-    <a class="back" href="/">← all reports</a>
-    <h1>${esc(fmtDate(m.receivedAt))}</h1>
-    <p class="note">${esc(m.note) || '<em>no note</em>'}</p>
-    <dl>
-      <dt>Page</dt><dd>${esc(m.url)}</dd>
-      <dt>Length</dt><dd>${esc(fmtDuration(m.endedAt - m.startedAt))}</dd>
-      <dt>Viewport</dt><dd>${esc(m.viewport.width)} × ${esc(m.viewport.height)}</dd>
-      <dt>Browser</dt><dd>${esc(m.userAgent)}</dd>
-    </dl>
-    <button type="button" id="delete">Delete report</button>
+  <header class="top">
+    <div class="bar">
+      <a class="back" href="/">All reports</a>
+      ${position}
+      ${step('newer', at > 0 ? ids[at - 1] : null, 'Newer')}
+      ${step('older', at !== -1 ? ids[at + 1] : null, 'Older')}
+      <button type="button" id="delete">Delete report</button>
+    </div>
+    <p class="note">${esc(m.note) || '<em>No note</em>'}</p>
+    <ul class="facts">
+      <li>${esc(fmtDate(m.receivedAt))}</li>
+      <li>${esc(m.url)}</li>
+      <li>${esc(fmtDuration(m.endedAt - m.startedAt))} long</li>
+      <li>${esc(m.viewport.width)} × ${esc(m.viewport.height)} window</li>
+      <li class="ua" title="${esc(m.userAgent)}">${esc(m.userAgent)}</li>
+    </ul>
   </header>
   <div class="stage">
-    <div id="player"></div>
-    <ol id="log" class="log"></ol>
+    <div class="main">
+      <div id="player"></div>
+      <div id="marks" class="marks" title="Errors, warnings and page changes. Click to jump."></div>
+      <p class="keys"><kbd>Space</kbd> play or pause <kbd>J</kbd> <kbd>K</kbd> next or previous entry <kbd>[</kbd> <kbd>]</kbd> newer or older report</p>
+    </div>
+    <aside class="side">
+      <div id="filters" class="filters">${filters}</div>
+      <ol id="log" class="log"></ol>
+    </aside>
   </div>
 </main>
 <link rel="stylesheet" href="/vendor/rrweb-player.min.css">
+<link rel="stylesheet" href="/viewer.css">
 <script src="/vendor/rrweb-player.min.js"></script>
 <script src="/entries.js"></script>
 <script src="/viewer.js"></script>`;

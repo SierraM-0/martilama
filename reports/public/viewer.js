@@ -1,9 +1,11 @@
-// Report page: loads the events, mounts rrweb-player, and keeps the side
-// panel (console, navigations, tab changes) in step with playback.
+// Report page: loads the events, mounts rrweb-player, and keeps the console
+// panel and the marker strip in step with playback.
 (async function () {
   const root = document.getElementById('report');
   const log = document.getElementById('log');
   const mount = document.getElementById('player');
+  const marks = document.getElementById('marks');
+  const filters = document.getElementById('filters');
   const id = root.dataset.id;
 
   document.getElementById('delete').addEventListener('click', async () => {
@@ -13,7 +15,28 @@
     else alert('Could not delete the report.');
   });
 
-  const fail = (msg) => { mount.textContent = msg; };
+  // Stepping between reports works even when this recording fails to load.
+  let player = null;
+  let step = () => {};
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target.closest('input, textarea, select')) return;
+    const go = (linkId) => document.getElementById(linkId)?.click();
+    if (e.key === '[') go('newer');
+    else if (e.key === ']') go('older');
+    else if (e.key === 'j' || e.key === 'J') step(1);
+    else if (e.key === 'k' || e.key === 'K') step(-1);
+    else if (e.key === ' ' && player && !e.target.closest('button, a')) {
+      e.preventDefault(); // keep Space from scrolling the page
+      player.toggle();
+    }
+  });
+
+  const fail = (msg) => {
+    mount.textContent = msg;
+    marks.hidden = true;
+    filters.hidden = true;
+  };
 
   let events;
   try {
@@ -26,26 +49,44 @@
   // rrweb needs a Meta + FullSnapshot pair to draw anything.
   if (!Array.isArray(events) || events.length < 2) return fail('This recording is empty.');
 
+  // Fit the replay and its controls in the window without scrolling.
+  const CONTROLLER = 80; // rrweb-player's control bar
+  const BELOW = 78; // marker strip + key hints + breathing room
   const vw = Number(root.dataset.vw) || 1280;
   const vh = Number(root.dataset.vh) || 720;
   const width = mount.clientWidth;
-  const height = Math.round(Math.min(window.innerHeight * 0.7, width * (vh / vw)));
+  const room = window.innerHeight - mount.getBoundingClientRect().top - CONTROLLER - BELOW;
+  const height = Math.round(Math.max(240, Math.min(room, width * (vh / vw))));
 
   const Player = window.rrwebPlayer.default || window.rrwebPlayer.Player || window.rrwebPlayer;
-  const player = new Player({
+  player = new Player({
     target: mount,
     props: { events, width, height, autoPlay: false, skipInactive: false, showController: true },
   });
+  const total = Math.max(1, events[events.length - 1].timestamp - events[0].timestamp);
+
+  // Line the marker strip up with the player's own progress bar, so a tick
+  // sits directly under the same moment on the bar above it.
+  const bar = mount.querySelector('.rr-progress');
+  if (bar) {
+    const outer = marks.parentElement.getBoundingClientRect();
+    const inner = bar.getBoundingClientRect();
+    marks.style.marginLeft = `${inner.left - outer.left}px`;
+    marks.style.width = `${inner.width}px`;
+  }
 
   const fmt = (ms) => {
     const s = Math.max(0, Math.floor(ms / 1000));
     return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
   };
 
-  const entries = window.ReportEntries.build(events);
+  const { build, group, counts } = window.ReportEntries;
+  const entries = build(events).map((entry) => ({ ...entry, group: group(entry) }));
+
+  // console panel
   const items = entries.map((entry) => {
     const li = document.createElement('li');
-    li.className = `entry ${entry.kind} lvl-${entry.level}`;
+    li.className = `entry ${entry.group}`;
     const time = document.createElement('time');
     time.textContent = fmt(entry.offset);
     const text = document.createElement('span');
@@ -55,25 +96,88 @@
     log.append(li);
     return li;
   });
-  if (!items.length) {
-    const li = document.createElement('li');
-    li.className = 'entry empty';
-    li.textContent = 'No console output or navigation in this recording.';
-    log.append(li);
-  }
+  const none = document.createElement('li');
+  none.className = 'entry none';
+  log.append(none);
 
-  let lastShown = -1;
-  player.addEventListener('ui-update-current-time', (e) => {
-    const now = e.payload;
-    let current = -1;
-    for (let i = 0; i < entries.length; i++) {
-      const past = entries[i].offset <= now;
-      items[i].classList.toggle('past', past);
-      if (past) current = i;
-    }
-    if (current !== lastShown && current >= 0) {
-      items[current].scrollIntoView({ block: 'nearest' });
-      lastShown = current;
-    }
+  // marker strip: one tick per error, warning and navigation, plus a playhead
+  const ticks = entries.map((entry) => {
+    if (entry.group === 'log') return null;
+    const tick = document.createElement('button');
+    tick.type = 'button';
+    tick.className = `mark ${entry.group}`;
+    tick.style.left = `${(entry.offset / total) * 100}%`;
+    tick.title = `${fmt(entry.offset)}  ${entry.text}`;
+    tick.addEventListener('click', (e) => {
+      e.stopPropagation();
+      player.goto(entry.offset);
+    });
+    marks.append(tick);
+    return tick;
   });
+  const head = document.createElement('span');
+  head.className = 'head';
+  marks.append(head);
+  marks.addEventListener('click', (e) => {
+    const box = marks.getBoundingClientRect();
+    player.goto(Math.round(((e.clientX - box.left) / box.width) * total));
+  });
+
+  // filters
+  const shown = new Set(['error', 'warning', 'log', 'nav']);
+  const tally = counts(entries);
+  const applyFilters = () => {
+    let visible = 0;
+    entries.forEach((entry, i) => {
+      const on = shown.has(entry.group);
+      items[i].hidden = !on;
+      if (ticks[i]) ticks[i].hidden = !on;
+      if (on) visible += 1;
+    });
+    none.hidden = visible > 0;
+    none.textContent = entries.length ? 'Nothing matches the filters.' : 'No console output or navigation in this recording.';
+  };
+  filters.querySelectorAll('button').forEach((btn) => {
+    const key = btn.dataset.filter;
+    btn.querySelector('.n').textContent = tally[key];
+    btn.disabled = tally[key] === 0;
+    btn.addEventListener('click', () => {
+      const on = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(on));
+      if (on) shown.add(key); else shown.delete(key);
+      applyFilters();
+      sync(now);
+    });
+  });
+  applyFilters();
+
+  // follow playback: highlight the latest visible entry at or before now
+  let now = 0;
+  let current = -1;
+  function sync(time) {
+    now = time;
+    head.style.left = `${Math.min(100, (time / total) * 100)}%`;
+    let latest = -1;
+    for (let i = 0; i < entries.length; i++) {
+      if (entries[i].offset <= time && shown.has(entries[i].group)) latest = i;
+    }
+    if (latest === current) return;
+    if (current >= 0) items[current].classList.remove('current');
+    current = latest;
+    if (current >= 0) {
+      items[current].classList.add('current');
+      items[current].scrollIntoView({ block: 'nearest' });
+    }
+  }
+  player.addEventListener('ui-update-current-time', (e) => sync(e.payload));
+  sync(0);
+
+  // J / K: jump to the next or previous visible entry
+  step = (dir) => {
+    const visible = entries.filter((entry) => shown.has(entry.group));
+    const target = dir > 0
+      ? visible.find((entry) => entry.offset > now + 50)
+      : visible.filter((entry) => entry.offset < now - 50).pop();
+    if (target) player.goto(target.offset);
+  };
 })();
