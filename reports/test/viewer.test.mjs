@@ -178,3 +178,16 @@ test('each list row is one link wrapping the date, page, note and length', async
   for (const part of ['2023-11-14 22:13 UTC', '/blog', 'whole row', '3:05']) assert.ok(row[1].includes(part), part);
   assert.ok(!row[1].includes('<a '), 'no nested link');
 });
+
+test('report details are a labelled list, one detail per row', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const html = await (await get(`/r/${id}`, e)).text();
+  const dl = html.match(/<dl class="facts">([\s\S]*?)<\/dl>/);
+  assert.ok(dl, 'facts list');
+  const labels = [...dl[1].matchAll(/<dt>([^<]*)<\/dt>/g)].map((m) => m[1]);
+  assert.deepEqual(labels, ['Received', 'Page', 'Length', 'Window', 'Browser']);
+  for (const v of ['2023-11-14 22:13 UTC', 'https://martilama.com/blog', '3:05', '1280 × 720', 'test-agent']) {
+    assert.ok(dl[1].includes(`<dd>${v}</dd>`), v);
+  }
+});

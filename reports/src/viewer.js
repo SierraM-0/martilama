@@ -96,13 +96,13 @@ async function reportPage(env, id) {
       <button type="button" id="delete" class="btn danger">Delete report</button>
     </div>
     <p class="note">${esc(m.note) || '<em>No note</em>'}</p>
-    <ul class="facts">
-      <li>${esc(fmtDate(m.receivedAt))}</li>
-      <li>${esc(m.url)}</li>
-      <li>${esc(fmtDuration(m.endedAt - m.startedAt))} long</li>
-      <li>${esc(m.viewport.width)} × ${esc(m.viewport.height)} window</li>
-      <li class="ua" title="${esc(m.userAgent)}">${esc(m.userAgent)}</li>
-    </ul>
+    <dl class="facts">
+      <div><dt>Received</dt><dd>${esc(fmtDate(m.receivedAt))}</dd></div>
+      <div><dt>Page</dt><dd>${esc(m.url)}</dd></div>
+      <div><dt>Length</dt><dd>${esc(fmtDuration(m.endedAt - m.startedAt))}</dd></div>
+      <div><dt>Window</dt><dd>${esc(m.viewport.width)} × ${esc(m.viewport.height)}</dd></div>
+      <div><dt>Browser</dt><dd>${esc(m.userAgent)}</dd></div>
+    </dl>
   </header>
   <div class="stage">
     <div class="main">
