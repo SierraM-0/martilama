@@ -1,11 +1,12 @@
+/* Colours are martilama.com's own palette, light and dark. */
 :root {
-  --bg: #ffffff; --text: #1f2328; --muted: #656d76; --border: #d8dee4; --panel: #f6f8fa;
-  --accent: #0b62d6; --warn: #8a5a00; --error: #c21f1f; --nav: #0b62d6; --current: #e9f1fd;
+  --bg: #faf8f5; --text: #2b2722; --muted: #6b6358; --border: #e7e0d6; --panel: #f1ece4;
+  --accent: #b85c38; --warn: #8a5a00; --error: #a3271d; --nav: #b85c38; --current: #f1ece4;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #101216; --text: #e3e6ea; --muted: #99a1ab; --border: #2b3038; --panel: #181b21;
-    --accent: #79aaff; --warn: #e2b354; --error: #ff8279; --nav: #79aaff; --current: #1c2a44;
+    --bg: #14110e; --text: #e8e2d9; --muted: #9a9085; --border: #2a241e; --panel: #1d1813;
+    --accent: #e0915f; --warn: #d9a441; --error: #ef7d70; --nav: #e0915f; --current: #1d1813;
   }
 }
 * { box-sizing: border-box; }
@@ -54,8 +55,15 @@ main.report { padding: 0.75rem 1rem 1rem; }
 #player .rr-controller__btns button { color: var(--text); }
 #player .rr-controller__btns button svg { fill: currentColor; }
 #player .rr-controller__btns button:active, #player .rr-controller__btns button.active { background: var(--accent); color: var(--bg); }
-#player .rr-progress { background: var(--border); }
+#player .rr-progress { background: var(--border); border-color: var(--panel); }
+#player .rr-progress__step { background: color-mix(in oklab, var(--accent) 35%, transparent); }
+#player .rr-progress__handler { background: var(--accent); }
+/* the strip below carries the event markers, so hide the player's own */
+#player .rr-progress > div:not(.rr-progress__step):not(.rr-progress__handler) { display: none; }
+#player .rr-controller__btns button:active { background: var(--border); }
 #player .switch label::before { background: var(--border); }
+#player .switch input:checked + label::before { background: var(--accent); }
+#player .replayer-mouse::after { background: var(--accent); }
 
 /* marker strip */
 .marks { position: relative; height: 26px; margin-top: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); cursor: pointer; }
