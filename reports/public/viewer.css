@@ -77,12 +77,21 @@ main.report { padding: 0.75rem 1rem 1rem; animation: arrive 0.3s ease-out; }
 .top .bar { display: flex; align-items: center; gap: 0.5rem; }
 .top .pos { color: var(--muted); font-style: italic; margin-left: auto; margin-right: 0.25rem; }
 .top .danger { margin-left: 0.5rem; }
-.top .note { margin: 0.55rem 0 0; font: 600 1.35rem/1.25 var(--display); letter-spacing: -0.01em; overflow-wrap: anywhere; }
-.top .note em { font: italic 400 1.2rem var(--body); }
-.facts { margin: 0.35rem 0 0; font-size: 0.95rem; line-height: 1.4; }
+.top .when { margin: 0 0 0 0.4rem; font: 600 1.15rem/1.3 var(--display); letter-spacing: -0.005em; font-variant-numeric: tabular-nums; }
+.more { margin-top: 0.5rem; }
+.more summary { list-style: none; width: max-content; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary::after { content: "▸"; font-size: 0.8em; color: var(--muted); }
+.more[open] summary::after { content: "▾"; }
+.facts { margin: 0.5rem 0 0; font-size: 0.95rem; line-height: 1.4; }
 .facts div { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0 0.75rem; }
 .facts dt { font-style: italic; color: var(--muted); }
 .facts dd { margin: 0; overflow-wrap: anywhere; }
+
+/* the visitor's own words, under the replay */
+.note { margin: 12px 0 0; font: 600 1.2rem/1.3 var(--display); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.note::before { content: "Visitor's note"; display: block; font: italic 400 0.9rem/1.4 var(--body); letter-spacing: 0; color: var(--muted); }
+.note em { font: italic 400 1.05rem var(--body); }
 
 /* replay | divider | console: one block, with the split adjustable */
 .stage { display: grid; grid-template-columns: minmax(0, 1fr) 12px var(--side, 25rem); margin-top: 0.75rem; align-items: stretch; }
@@ -98,6 +107,12 @@ main.report { padding: 0.75rem 1rem 1rem; animation: arrive 0.3s ease-out; }
 
 /* rrweb-player: sit flat in the page and follow the palette */
 #player .rr-player { float: none; box-shadow: 0 14px 30px -22px rgb(60 40 20 / 0.5); border: 1px solid var(--border); border-radius: 8px; background: var(--panel); overflow: hidden; }
+/* click the replay to play or pause; a play mark shows while it is stopped */
+#player .rr-player__frame { position: relative; cursor: pointer; }
+.playhint { position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; background: color-mix(in oklab, var(--text) 62%, transparent); pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 3; }
+.playhint::before { content: ""; position: absolute; left: 27px; top: 20px; border-left: 20px solid var(--bg); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
+#player .rr-player__frame.playing .playhint { opacity: 0; transform: scale(1.25); }
+#player .rr-player__frame:hover .playhint { background: color-mix(in oklab, var(--accent) 85%, transparent); }
 #player .rr-controller { background: var(--panel); color: var(--text); border-radius: 0; font-family: var(--body); }
 #player .rr-timeline__time { color: var(--text); font-variant-numeric: tabular-nums; }
 #player .rr-controller__btns button { color: var(--text); font-family: var(--body); }
@@ -121,7 +136,7 @@ main.report { padding: 0.75rem 1rem 1rem; animation: arrive 0.3s ease-out; }
 .mark.error::before { background: var(--error); top: 0; bottom: 0; }
 .mark:hover::before, .mark.on::before { top: -2px; bottom: -2px; left: 3px; width: 5px; }
 
-.keys { margin: 10px 0 0; font-size: 0.9rem; font-style: italic; color: var(--muted); }
+.keys { margin: 8px 0 0; font-size: 0.9rem; font-style: italic; color: var(--muted); }
 kbd { font: 0.72rem var(--mono); font-style: normal; padding: 0.08rem 0.4rem; border: 1px solid var(--edge); border-bottom-width: 2px; border-radius: 5px; background: var(--raise); color: var(--text); margin-left: 0.7rem; }
 kbd:first-child { margin-left: 0; }
 kbd + kbd { margin-left: 0.15rem; }
@@ -164,5 +179,5 @@ kbd + kbd { margin-left: 0.15rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   main.report { animation: none; }
-  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after { transition: none; }
+  .btn, .entry, .mark::before, .reports a.row, .divider::before, .divider::after, .playhint { transition: none; }
 }

@@ -90,23 +90,27 @@ async function reportPage(env, id) {
   <header class="top">
     <div class="bar">
       <a class="btn back" href="/">← All reports</a>
+      <h1 class="when">${esc(fmtDate(m.receivedAt))}</h1>
       ${position}
       ${step('newer', at > 0 ? ids[at - 1] : null, 'Newer')}
       ${step('older', at !== -1 ? ids[at + 1] : null, 'Older')}
       <button type="button" id="delete" class="btn danger">Delete report</button>
     </div>
-    <p class="note">${esc(m.note) || '<em>No note</em>'}</p>
-    <dl class="facts">
-      <div><dt>Received</dt><dd>${esc(fmtDate(m.receivedAt))}</dd></div>
-      <div><dt>Page</dt><dd>${esc(m.url)}</dd></div>
-      <div><dt>Length</dt><dd>${esc(fmtDuration(m.endedAt - m.startedAt))}</dd></div>
-      <div><dt>Window</dt><dd>${esc(m.viewport.width)} × ${esc(m.viewport.height)}</dd></div>
-      <div><dt>Browser</dt><dd>${esc(m.userAgent)}</dd></div>
-    </dl>
+    <details id="details" class="more">
+      <summary class="btn">Details</summary>
+      <dl class="facts">
+        <div><dt>Received</dt><dd>${esc(fmtDate(m.receivedAt))}</dd></div>
+        <div><dt>Page</dt><dd>${esc(m.url)}</dd></div>
+        <div><dt>Length</dt><dd>${esc(fmtDuration(m.endedAt - m.startedAt))}</dd></div>
+        <div><dt>Window</dt><dd>${esc(m.viewport.width)} × ${esc(m.viewport.height)}</dd></div>
+        <div><dt>Browser</dt><dd>${esc(m.userAgent)}</dd></div>
+      </dl>
+    </details>
   </header>
   <div class="stage">
     <div class="main">
-      <div id="player"></div>
+      <div id="player" title="Click the replay to play or pause"></div>
+      <p class="note" id="note">${esc(m.note) || '<em>The visitor left no note.</em>'}</p>
       <p class="keys"><kbd>Space</kbd> play or pause <kbd>J</kbd> <kbd>K</kbd> next or previous entry <kbd>[</kbd> <kbd>]</kbd> newer or older report</p>
     </div>
     <div id="divider" class="divider" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Resize replay and console" title="Drag to resize. Double-click to reset."></div>

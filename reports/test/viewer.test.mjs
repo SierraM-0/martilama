@@ -203,3 +203,32 @@ test('report page has a draggable divider between the replay and the console', a
   assert.match(html, /id="divider"[^>]*tabindex="0"/);
   assert.match(html, /id="divider"[^>]*aria-label="Resize replay and console"/);
 });
+
+test('details are collapsed until asked for, and still complete', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const html = await (await get(`/r/${id}`, e)).text();
+  const block = html.match(/<details id="details"[^>]*>([\s\S]*?)<\/details>/);
+  assert.ok(block, 'details element');
+  assert.ok(!/<details id="details"[^>]*\bopen\b/.test(html), 'closed by default');
+  assert.match(block[1], /<summary[^>]*>Details<\/summary>/);
+  assert.ok(block[1].includes('<dl class="facts">') && block[1].includes('<dd>test-agent</dd>'));
+});
+
+test("the visitor's note sits below the replay and above the key hints", async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000, note: 'note <placement>' });
+  const html = await (await get(`/r/${id}`, e)).text();
+  const player = html.indexOf('id="player"');
+  const note = html.indexOf('<p class="note" id="note">note &lt;placement&gt;</p>');
+  const keys = html.indexOf('<p class="keys">');
+  assert.ok(player > 0 && note > player && keys > note, `order: ${player} ${note} ${keys}`);
+  assert.equal(html.split('note &lt;placement&gt;').length - 1, 1, 'note appears once');
+});
+
+test('a report without a note says so in the same place', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000, note: '' });
+  const html = await (await get(`/r/${id}`, e)).text();
+  assert.ok(html.includes('<p class="note" id="note"><em>The visitor left no note.</em></p>'));
+});

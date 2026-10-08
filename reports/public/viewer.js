@@ -65,12 +65,15 @@
 
   // Fit the replay and its controls in the window without scrolling.
   const CONTROLLER = 80; // rrweb-player's control bar
-  const BELOW = 48; // key hints + breathing room
   const vw = Number(root.dataset.vw) || 1280;
   const vh = Number(root.dataset.vh) || 720;
+  // Height taken by what sits under the replay: the note and the key hints.
+  const below = () => [...mount.parentElement.children]
+    .filter((el) => el !== mount)
+    .reduce((h, el) => h + el.getBoundingClientRect().height + parseFloat(getComputedStyle(el).marginTop), 16);
   const fit = () => {
     const width = mount.clientWidth;
-    const room = window.innerHeight - mount.getBoundingClientRect().top - window.scrollY - CONTROLLER - BELOW;
+    const room = window.innerHeight - mount.getBoundingClientRect().top - window.scrollY - CONTROLLER - below();
     return { width, height: Math.round(Math.max(240, Math.min(room, width * (vh / vw)))) };
   };
   const { width, height } = fit();
@@ -92,6 +95,19 @@
     });
   };
   window.addEventListener('resize', refit);
+  document.getElementById('details').addEventListener('toggle', refit);
+
+  // Clicking the replay itself plays or pauses, like a video.
+  const frame = mount.querySelector('.rr-player__frame');
+  if (frame) {
+    const hint = document.createElement('span');
+    hint.className = 'playhint';
+    frame.append(hint);
+    frame.addEventListener('click', () => player.toggle());
+    player.addEventListener('ui-update-player-state', (e) => {
+      frame.classList.toggle('playing', e.payload === 'playing');
+    });
+  }
 
   const sideWidth = () => document.querySelector('.side').getBoundingClientRect().width;
   const commit = (px) => {
