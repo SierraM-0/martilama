@@ -126,16 +126,22 @@ async function reportPage(env, id) {
   const filters = FILTERS.map(([key, label]) =>
     `<button type="button" class="btn" data-filter="${key}" aria-pressed="true">${label} <span class="n"></span></button>`).join('');
   const body = `<main class="report" id="report" data-id="${esc(m.id)}" data-vw="${esc(m.viewport.width)}" data-vh="${esc(m.viewport.height)}">
-  <header class="top">
-    <div class="bar">
-      <a class="btn back" href="/">← All reports</a>
-      <h1 class="when">${esc(fmtDate(m.receivedAt))}</h1>
+  <header class="site-header compact">
+    <p class="brand"><a href="/" title="All reports">
+      ${LOGO}
+      <span class="name">martilama</span>
+      <span class="what">problem reports</span>
+    </a></p>
+    <h1 class="when">${esc(fmtDate(m.receivedAt))}</h1>
+    <nav>
       ${position}
       ${step('newer', at > 0 ? ids[at - 1] : null, 'Newer')}
       ${step('older', at !== -1 ? ids[at + 1] : null, 'Older')}
       <button type="button" id="delete" class="btn danger">Delete report</button>
       ${THEME_TOGGLE}
-    </div>
+    </nav>
+  </header>
+  <div class="top">
     <details id="details" class="more">
       <summary class="btn">Details</summary>
       <dl class="facts">
@@ -146,7 +152,7 @@ async function reportPage(env, id) {
         <div><dt>Browser</dt><dd>${esc(m.userAgent)}</dd></div>
       </dl>
     </details>
-  </header>
+  </div>
   <div class="stage">
     <div class="main">
       <div id="player" title="Click the replay to play or pause"></div>

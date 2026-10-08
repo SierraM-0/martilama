@@ -312,3 +312,21 @@ test("the list page has the service's own mark, faint, in the background, and re
   assert.match(css, /\.rune-mark \{ display: none; \}/);
   assert.match(css, /@media \(min-width: 1100px\) \{\s*\.rune-mark \{[^}]*width: 360px;[^}]*opacity: 0\.07;/);
 });
+
+test('report pages have the same clickable brand header, and no separate All reports button', async () => {
+  const e = env();
+  const id = await seed(e.REPORTS, { now: 1_700_000_000_000 });
+  const html = await (await get(`/r/${id}`, e)).text();
+  const header = html.match(/<header class="site-header compact">([\s\S]*?)<\/header>/);
+  assert.ok(header, 'compact site header');
+  assert.match(header[1], /<p class="brand"><a href="\/" title="All reports">\s*<svg class="logo"/);
+  assert.match(header[1], /<span class="name">martilama<\/span>\s*<span class="what">problem reports<\/span>/);
+  // the report's own controls live in the header too
+  for (const s of ['<h1 class="when">2023-11-14 22:13 UTC</h1>', 'class="pos"', 'id="delete"', 'id="theme-toggle"']) {
+    assert.ok(header[1].includes(s), s);
+  }
+  assert.ok(!html.includes('All reports</a>'), 'no All reports button');
+  assert.equal(html.split('<h1').length - 1, 1, 'one h1');
+  // details still follow the header
+  assert.ok(html.indexOf('<details id="details"') > html.indexOf('</header>'));
+});
