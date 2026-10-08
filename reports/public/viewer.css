@@ -137,6 +137,7 @@ main.report { padding: 0.75rem 1rem 1rem; animation: arrive 0.3s ease-out; }
 kbd { font: 0.72rem var(--mono); font-style: normal; padding: 0.08rem 0.4rem; border: 1px solid var(--edge); border-bottom-width: 2px; border-radius: 5px; background: var(--raise); color: var(--text); margin-left: 0.7rem; }
 kbd:first-child { margin-left: 0; }
 kbd + kbd { margin-left: 0.15rem; }
+.keys .alt { margin-left: 0.9rem; opacity: 0.75; }
 
 /* console panel */
 /* height: 0 + min-height: 100% makes the console exactly as tall as the replay column */

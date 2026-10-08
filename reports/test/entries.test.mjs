@@ -176,3 +176,30 @@ test('currentIndex: a pinned entry hidden by a filter is ignored', () => {
   const offsets = [0, 5000, 5000];
   assert.equal(currentIndex(offsets, [true, false, true], 5000, 1), 2);
 });
+
+test('shortcut: arrow keys step between entries, as J and K do', () => {
+  assert.equal(shortcut(press('ArrowRight')), 'next');
+  assert.equal(shortcut(press('ArrowLeft')), 'previous');
+  assert.equal(shortcut(press('ArrowRight', { onControl: true })), 'next');
+});
+
+test('shortcut: Shift with Up or Down steps between reports, as [ and ] do', () => {
+  assert.equal(shortcut(press('ArrowUp', { shiftKey: true })), 'newer');
+  assert.equal(shortcut(press('ArrowDown', { shiftKey: true })), 'older');
+});
+
+test('shortcut: arrows that already mean something are left alone', () => {
+  // plain Up/Down scroll; Alt+Left is the browser's Back; Shift+Left/Right select text
+  assert.equal(shortcut(press('ArrowUp')), null);
+  assert.equal(shortcut(press('ArrowDown')), null);
+  assert.equal(shortcut(press('ArrowLeft', { altKey: true })), null);
+  assert.equal(shortcut(press('ArrowRight', { ctrlKey: true })), null);
+  assert.equal(shortcut(press('ArrowRight', { shiftKey: true })), null);
+  assert.equal(shortcut(press('ArrowUp', { shiftKey: true, ctrlKey: true })), null);
+  // on the divider, Left and Right resize the split
+  assert.equal(shortcut(press('ArrowLeft', { onSeparator: true })), null);
+  assert.equal(shortcut(press('ArrowRight', { onSeparator: true })), null);
+  // and never while typing
+  assert.equal(shortcut(press('ArrowRight', { typing: true })), null);
+  assert.equal(shortcut(press('ArrowDown', { shiftKey: true, typing: true })), null);
+});

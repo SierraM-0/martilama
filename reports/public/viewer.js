@@ -21,11 +21,13 @@
   document.addEventListener('keydown', (e) => {
     const el = e.target instanceof Element ? e.target : null;
     const action = window.ReportEntries.shortcut({
-      key: e.key, ctrlKey: e.ctrlKey, altKey: e.altKey, metaKey: e.metaKey,
+      key: e.key, ctrlKey: e.ctrlKey, altKey: e.altKey, metaKey: e.metaKey, shiftKey: e.shiftKey,
+      onSeparator: !!el?.closest('[role="separator"]'),
       typing: !!el?.closest('input, textarea, select, [contenteditable]'),
       onControl: !!el?.closest('button, a, summary, [tabindex]'),
     });
     if (!action) return;
+    if (e.key.startsWith('Arrow')) e.preventDefault(); // no scrolling or text selection
     if (action === 'newer' || action === 'older') document.getElementById(action)?.click();
     else if (action === 'next') step(1);
     else if (action === 'previous') step(-1);

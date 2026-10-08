@@ -59,10 +59,22 @@
   }
 
   // Which viewer action a key press means, or null. Pure so it can be tested:
-  // the caller says whether focus is in a text field (typing) or on a control
-  // that uses Space itself (onControl).
-  function shortcut({ key, ctrlKey, altKey, metaKey, onControl, typing }) {
+  // the caller says whether focus is in a text field (typing), on a control
+  // that uses Space itself (onControl), or on the split divider (onSeparator).
+  function shortcut({ key, ctrlKey, altKey, metaKey, shiftKey, onControl, onSeparator, typing }) {
     if (typing || metaKey) return null;
+    // Arrow keys do the same jobs as the letter keys, for browsers where an
+    // extension (Vim-style navigation, say) takes J, K and the brackets.
+    if (key === 'ArrowUp' || key === 'ArrowDown') {
+      if (!shiftKey || ctrlKey || altKey) return null; // plain Up/Down scroll
+      return key === 'ArrowUp' ? 'newer' : 'older';
+    }
+    if (key === 'ArrowLeft' || key === 'ArrowRight') {
+      // On the divider these resize the split; with a modifier they belong
+      // to the browser (Alt+Left is Back) or to text selection.
+      if (shiftKey || ctrlKey || altKey || onSeparator) return null;
+      return key === 'ArrowRight' ? 'next' : 'previous';
+    }
     if (key === '[' || key === ']') {
       // On many layouts brackets need AltGr (reported as Ctrl+Alt) or Option
       // (Alt). Only a bare Ctrl is someone else's shortcut.
