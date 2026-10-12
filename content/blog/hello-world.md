@@ -6,8 +6,8 @@ date: 2026-05-19
 
 This is the first post on my new blog.
 
-It's built with [Astro](https://astro.build/), a static site generator, and
-deployed on Cloudflare. Every post here is a Markdown file in a git
+It's built with a hand-written static site generator, and deployed on
+Cloudflare. Every post here is a Markdown file in a git
 repository — when I push, the site rebuilds itself.
 
 There's also an [RSS feed](/rss.xml), so you can follow along in a feed
