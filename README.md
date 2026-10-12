@@ -1,41 +1,57 @@
 # martilama.com
 
-Personal site built with [Astro](https://astro.build/) — home, about, a
-lightweight work page, and the blog. Lives under
-`Yggdrasil/Asgard/Bragi/site/`. Deployed to Cloudflare, live at
-[martilama.com](https://martilama.com).
+Personal site: home, about, a lightweight work page, and the blog. Hand-built
+with a small Node.js static site generator, with no site framework. Deployed
+to Cloudflare, live at [martilama.com](https://martilama.com).
+
+It was first built with Astro and then rebuilt from scratch; the plans for
+both are in `docs/superpowers/`.
+
+## How it is built
+
+- `build.js` is the whole build: it loads the posts, optimises the images,
+  renders every page to `dist/`, and writes the RSS feed, sitemap and share
+  images.
+- Pages, layouts and components are plain functions that take data and return
+  an HTML string (`pages/`, `layouts/`, `components/`, with the `html` helper
+  in `lib/html.js`).
+- Markdown goes through unified, remark and rehype, with a local plugin for
+  Tufte-style sidenotes (`plugins/rehype-sidenotes.js`).
+- Client-side JavaScript is a few small files in `public/js/`, including a
+  hand-written router that crossfades between pages.
 
 ## Develop
 
+Needs Node 22 (see `.nvmrc`).
+
 ```bash
 npm install
-npm run dev      # local dev server
 npm run build    # static build to ./dist
-npm run preview  # preview the built site
+npm run preview  # serve ./dist at http://localhost:4321
+npm test         # unit tests (node:test)
 ```
+
+There is no dev server with live reload: rebuild, then refresh.
 
 ## Content
 
-- Posts: Markdown files in `src/content/blog/`. Frontmatter: `title`,
-  `description`, `date`, optional `cover`. No tags.
-- Photos: drop full-res files in `src/assets/` and import them; the build
-  optimises them via `astro:assets`. Replace `src/assets/portrait.png` with a
-  real photo.
+- Posts: Markdown files in `content/blog/`. Frontmatter: `title`,
+  `description`, `date`. No tags.
+- Photos: full-resolution files in `assets/`. Each one is listed in `build.js`
+  with the widths to generate.
 
 ## Deploy (Cloudflare)
 
-- Connect this GitHub repo (`SierraM-0/site`) to a Cloudflare Pages/Workers
-  Builds project.
+- Cloudflare builds and deploys on every push to `main` of this repo
+  (`SierraM-0/martilama`).
 - Build command: `npm run build`. Output directory: `dist`.
 - `public/_redirects` redirects the old `/atom.xml` to `/rss.xml`.
-- **Subdomain redirect:** configure a Cloudflare redirect rule so
-  `blog.martilama.com/*` → `https://martilama.com/blog/$1` (301). This is a
-  dashboard/DNS-level rule, not part of the static build.
+- **Subdomain redirect:** `blog.martilama.com/*` → `https://martilama.com/blog/$1`
+  (301) is a Cloudflare redirect rule, not part of the static build.
 
 ## Migration note
 
-Supersedes the old Zola blog at `Asgard/Bragi/blog/`. That repo is kept as an
-archive; post slugs/dates were preserved so existing links keep working behind
+Supersedes the old Zola blog. That repo is kept as an archive; post slugs/dates were preserved so existing links keep working behind
 the subdomain redirect.
 
 ## Problem reports
